@@ -1,0 +1,165 @@
+import {
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  // NavbarMenuToggle, // removed to use custom 3-line icon button
+  NavbarMenu,
+  NavbarMenuItem,
+  Select,
+  SelectItem,
+  Link,
+  Button,
+  Switch,
+} from '@heroui/react'
+
+import { LanguagesIcon, Sun, Moon, Zap, Menu } from 'lucide-react'
+import { GithubIcon } from '../icons/GithubIcon'
+import { useState } from 'react'
+
+import { useLanguageStore } from '../../stores/useLanguageStore'
+import { useThemeStore } from '../../stores/useThemeStore'
+
+const languageOptions = [
+  { key: 'en', label: 'Inglés' },
+  { key: 'es', label: 'Español' },
+]
+
+export const NavbarUI = () => {
+  const { language, setLanguage } = useLanguageStore()
+  const { theme, setTheme } = useThemeStore()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  return (
+    <Navbar 
+      className="px-4 sm:px-6 lg:px-8 sticky top-0 z-40 bg-white/60 dark:bg-slate-900/60 backdrop-blur supports-[backdrop-filter]:bg-white/50 dark:supports-[backdrop-filter]:bg-slate-900/50 border-b border-slate-200/60 dark:border-slate-700/60"
+      maxWidth="full"
+      onMenuOpenChange={setIsMenuOpen}
+      isMenuOpen={isMenuOpen}
+    >
+      {/* Brand a la izquierda en móvil y desktop */}
+      <NavbarContent justify="start" className="flex-1">
+        <NavbarBrand>
+          <div className="flex items-center gap-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white">
+              <Zap size={14} />
+            </span>
+            <span className="font-semibold text-slate-800 dark:text-slate-100">BrochuresAI</span>
+          </div>
+        </NavbarBrand>
+      </NavbarContent>
+
+      {/* Botón hamburguesa (3 líneas) a la derecha en móvil */}
+      <NavbarContent justify="end" className="sm:hidden">
+        <Button
+          isIconOnly
+          variant="light"
+          radius="full"
+          aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          className="text-slate-800 dark:text-slate-100"
+          onPress={() => setIsMenuOpen((v) => !v)}
+        >
+          <Menu size={22} />
+        </Button>
+      </NavbarContent>
+
+      {/* Contenido derecho en desktop */}
+      <NavbarContent justify="end" className="hidden sm:flex gap-3">
+        <NavbarItem>
+          <Switch
+            aria-label="Cambiar tema"
+            size="lg"
+            isSelected={theme === 'dark'}
+            onValueChange={(isSelected) => setTheme(isSelected ? 'dark' : 'light')}
+            startContent={<Sun className="text-amber-500" size={16} />}
+            endContent={<Moon className="text-blue-400" size={16} />}
+            className="rounded-full"
+          />
+        </NavbarItem>
+        <NavbarItem>
+          <Select
+            disallowEmptySelection={true}
+            startContent={<LanguagesIcon className="text-slate-600 dark:text-slate-300" />}
+            defaultSelectedKeys={[language]}
+            className="w-36"
+            classNames={{
+              trigger: 'rounded-full bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200',
+              value: 'text-sm',
+            }}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0] as 'en' | 'es'
+              setLanguage(selected)
+            }}
+          >
+            {languageOptions.map((option) => (
+              <SelectItem key={option.key}>{option.label}</SelectItem>
+            ))}
+          </Select>
+        </NavbarItem>
+        <NavbarItem>
+          <Button
+            variant="flat"
+            color="secondary"
+            as={Link}
+            href="https://github.com"
+            className="rounded-full bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:bg-white dark:hover:bg-slate-800"
+          >
+            <GithubIcon />
+            GitHub
+          </Button>
+        </NavbarItem>
+      </NavbarContent>
+
+      <NavbarMenu className="bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-slate-200 dark:border-slate-700">
+        <NavbarMenuItem>
+          <div className="flex items-center justify-between w-full py-2">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Tema</span>
+            <Switch
+              aria-label="Cambiar tema"
+              size="md"
+              isSelected={theme === 'dark'}
+              onValueChange={(isSelected) => setTheme(isSelected ? 'dark' : 'light')}
+              startContent={<Sun className="text-amber-500" size={14} />}
+              endContent={<Moon className="text-blue-400" size={14} />}
+            />
+          </div>
+        </NavbarMenuItem>
+        <NavbarMenuItem>
+          <div className="w-full py-2">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Idioma</p>
+            <Select
+              disallowEmptySelection={true}
+              startContent={<LanguagesIcon className="text-slate-600 dark:text-slate-300" />}
+              defaultSelectedKeys={[language]}
+              className="w-full"
+              classNames={{
+                trigger: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200',
+                value: 'text-sm',
+              }}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as 'en' | 'es'
+                setLanguage(selected)
+              }}
+            >
+              {languageOptions.map((option) => (
+                <SelectItem key={option.key}>{option.label}</SelectItem>
+              ))}
+            </Select>
+          </div>
+        </NavbarMenuItem>
+        <NavbarMenuItem className="pt-2">
+          <Button
+            variant="flat"
+            color="secondary"
+            as={Link}
+            href="https://github.com"
+            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+            startContent={<GithubIcon />}
+          >
+            GitHub
+          </Button>
+        </NavbarMenuItem>
+      </NavbarMenu>
+    </Navbar>
+  )
+}
