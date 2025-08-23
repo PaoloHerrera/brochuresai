@@ -2,7 +2,7 @@ export const HEROTEXT = {
   en: {
     title: 'Generate brochures for your business with the power of AI.',
     description:
-      'Transform your website into a professional or fun brochure without any design knowledge. Our AI does the work for you.',
+      'Transform your website into a professional or funny brochure without any design knowledge. Our AI does the work for you.',
     chips: [
       'Smart Tracking',
       'AI-Powered Design',
@@ -10,8 +10,9 @@ export const HEROTEXT = {
       'No Registration Required',
       'Open Source',
       'Download as PDF',
-      'Email Delivery',
     ],
+    brochureFormTab: 'Brochure Form',
+    brochurePreviewTab: 'Brochure Preview',
   },
   es: {
     title: 'Genera folletos para tu negocio con el poder de la IA.',
@@ -24,7 +25,8 @@ export const HEROTEXT = {
       'No Requiere Registro',
       'Código Abierto',
       'Descargar como PDF',
-      'Envío via Email',
     ],
+    brochureFormTab: 'Formulario del Folleto',
+    brochurePreviewTab: 'Vista Previa del Folleto',
   },
 }

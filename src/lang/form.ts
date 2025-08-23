@@ -6,13 +6,13 @@ export const FORM_TEXT = {
     urlLabel: 'Website URL',
     languageLabel: 'Language',
     languageOptions: [
-      { code: 'en', label: 'EN English' },
-      { code: 'es', label: 'ES Spanish' },
+      { code: 'en', label: 'English' },
+      { code: 'es', label: 'Spanish' },
     ],
     style: 'Style',
     styleOptions: [
       { value: 'professional', label: 'Professional' },
-      { value: 'fun', label: 'Fun' },
+      { value: 'funny', label: 'Funny' },
     ],
     submitButton: 'Generate Brochure',
   },
@@ -29,7 +29,7 @@ export const FORM_TEXT = {
     style: 'Estilo',
     styleOptions: [
       { value: 'professional', label: 'Profesional' },
-      { value: 'fun', label: 'Divertido' },
+      { value: 'funny', label: 'Divertido' },
     ],
     submitButton: 'Generar Folleto',
   },
