@@ -1,18 +1,36 @@
 import { useTranslate } from '../../hooks/useTranslate'
 import { HEROTEXT } from '../../lang/hero'
-import { Chip } from '@heroui/react'
-import { Sparkles, Zap, CheckCircle2 } from 'lucide-react'
+import { Chip, Tabs, Tab } from '@heroui/react'
+import { Sparkles, Zap, CheckCircle2, BookOpen, Eye } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import BrochureForm from '../ui/BrochureForm'
+import { useBrochureStore } from '../../stores/useBrochureStore'
+
+import { BrochurePreview } from '../ui/BrochurePreview'
 
 export const HeroSection = () => {
-  const { t, language } = useTranslate(HEROTEXT)
+  const { t } = useTranslate(HEROTEXT)
+
+  const { brochure } = useBrochureStore()
 
   const chipIcons = [
     <CheckCircle2 key="c1" size={14} />, 
     <Sparkles key="c2" size={14} />, 
     <Zap key="c3" size={14} />,
   ]
+
+  // Estado controlado para Tabs. Por defecto, formulario.
+  const [selectedTab, setSelectedTab] = useState<'brochure-form' | 'brochure-preview'>('brochure-form')
+
+  // Cuando llegue contenido al brochure por primera vez (o cambie), cambia a preview automáticamente.
+  useEffect(() => {
+    if (brochure.length > 0) {
+      setSelectedTab('brochure-preview')
+    } else {
+      setSelectedTab('brochure-form')
+    }
+  }, [brochure])
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
@@ -43,10 +61,44 @@ export const HeroSection = () => {
 
           {/* Columna derecha: Formulario dentro de un contenedor con badge */}
           <div className="relative w-full max-w-3xl lg:ml-auto">
-            <div className="absolute -right-2 -top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white shadow-md">
-              <span className="text-[10px] font-bold">{language.toUpperCase()}</span>
-            </div>
-            <BrochureForm />
+            <Tabs aria-label='brochure-tabs' classNames={
+              {
+                tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+                cursor: "w-full bg-[#22d3ee]",
+                tab: "max-w-fit px-0 h-12",
+                tabContent: "group-data-[selected=true]:text-[#06b6d4]",
+              }}
+                color="primary"
+                variant="underlined"
+                selectedKey={selectedTab}
+                onSelectionChange={(key) => setSelectedTab(String(key) as 'brochure-form' | 'brochure-preview')}
+                destroyInactiveTabPanel={false}
+              >
+              <Tab key="brochure-form" title={
+                <div className="flex items-center gap-2">
+                  <BookOpen size={16} />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {t.brochureFormTab}
+                  </span>
+                </div>
+              }>
+                <BrochureForm />
+              </Tab>
+              <Tab key="brochure-preview" title={
+                <div className="flex items-center gap-2">
+                  <Eye size={16} />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {t.brochurePreviewTab}
+                  </span>
+                </div>
+              }
+              isDisabled={brochure.length === 0}
+              >
+                <div className="w-full">
+                  <BrochurePreview />
+                </div>
+              </Tab>
+            </Tabs>
           </div>
         </div>
       </div>
