@@ -78,6 +78,7 @@ export const NavbarUI = () => {
         </NavbarItem>
         <NavbarItem>
           <Select
+            aria-label="Select language"
             disallowEmptySelection={true}
             startContent={<LanguagesIcon className="text-slate-600 dark:text-slate-300" />}
             defaultSelectedKeys={[language]}
