@@ -15,6 +15,7 @@ import { useLanguageStore } from '../../stores/useLanguageStore'
 import type { LanguageStore } from '../../stores/useLanguageStore'
 import { useBrochureStore } from '../../stores/useBrochureStore'
 import { FORM_TEXT } from '../../lang/form'
+import { useTranslate } from '../../hooks/useTranslate'
 
 import axios from 'axios'
 
@@ -24,8 +25,8 @@ const BrochureForm: FC = () => {
   
   // Language Store
   const { language } = useLanguageStore()
-  const text = FORM_TEXT[language]
-  const languages = text.languageOptions
+  const {t } = useTranslate(FORM_TEXT)
+  const languages = t.languageOptions
 
   // Brochure Store
   const { setBrochure, setCompanyName, setCacheKey } = useBrochureStore()
@@ -52,7 +53,7 @@ const BrochureForm: FC = () => {
     const companyNameHtml = (e.target as HTMLFormElement).elements.namedItem('companyName') as HTMLInputElement
     const urlHtml = (e.target as HTMLFormElement).elements.namedItem('url') as HTMLInputElement
 
-    const brochureFullLanguage = text.languageOptions.find((lang) => lang.code === Array.from(brochureLanguage)[0])?.label
+    const brochureFullLanguage = t.languageOptions.find((lang) => lang.code === Array.from(brochureLanguage)[0])?.label
 
     const response = await axios.post('http://localhost:8000/api/v1/create_brochure', {
       "company_name": companyNameHtml.value,
@@ -69,32 +70,32 @@ const BrochureForm: FC = () => {
 
   return (
     <Card className="max-w-3xl mx-auto p-6 shadow-lg bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
-      <Form onSubmit={handleSubmit} className="flex gap-4 flex-col">
+      <Form onSubmit={handleSubmit} className="flex flex-col gap-4 lg:gap-10">
         <div className="flex items-center gap-2 text-2xl font-semibold">
           <Globe className="text-blue-500" />
-          <span className="text-slate-900 dark:text-slate-100">{text.title}</span>
+          <span className="text-slate-900 dark:text-slate-100">{t.title}</span>
         </div>
-        <p className="text-gray-500 dark:text-slate-400 -mt-3 mb-2 text-sm">{text.description}</p>
+        <p className="text-gray-500 dark:text-slate-400 -mt-3 mb-2 text-sm">{t.description}</p>
         <div className='w-full'>
           <label className="block text-sm font-medium mb-1 text-slate-800 dark:text-slate-300">
-            {text.companyNameLabel}
+            {t.companyNameLabel}
           </label>
           <Input
             name="companyName"
             isDisabled={isLoading}
-            placeholder="Company Name" isRequired classNames={{
+            placeholder={t.companyNamePlaceholder} isRequired classNames={{
             inputWrapper: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
             input: 'text-slate-900 dark:text-slate-100'
           }} />
         </div>
         <div className="w-full">
           <label className="block text-sm font-medium mb-1 text-slate-800 dark:text-slate-300">
-            {text.urlLabel}
+            {t.urlLabel}
           </label>
           <Input
             name="url"
             isDisabled={isLoading}
-            placeholder="https://example.com" type="url" isRequired classNames={{
+            placeholder={t.urlPlaceholder} type="url" isRequired classNames={{
             inputWrapper: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
             input: 'text-slate-900 dark:text-slate-100'
           }} />
@@ -102,7 +103,7 @@ const BrochureForm: FC = () => {
         <div className="flex gap-4 w-full lg:flex-row flex-col">
           <div className="flex-1">
             <label className="block text-sm font-medium mb-1 text-slate-800 dark:text-slate-300">
-              {text.style}
+              {t.style}
             </label>
             <Select
               aria-label="Select brochure type"
@@ -121,7 +122,7 @@ const BrochureForm: FC = () => {
                 trigger: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100'
               }}
             >
-              {text.styleOptions.map((opt) => (
+              {t.styleOptions.map((opt) => (
                 <SelectItem
                   key={opt.value}
                   startContent={opt.value === 'professional' ? <Briefcase size={16} /> : <Smile size={16} />}
@@ -133,7 +134,7 @@ const BrochureForm: FC = () => {
           </div>
           <div className="flex-1">
             <label className="block text-sm font-medium mb-1 text-slate-800 dark:text-slate-300">
-              {text.languageLabel}
+              {t.languageLabel}
             </label>
             <Select
               aria-label="Select language"
@@ -163,7 +164,7 @@ const BrochureForm: FC = () => {
           type="submit"
           className="group relative mt-3 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-4 text-white text-lg font-semibold shadow-lg shadow-blue-600/20 transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full sm:w-auto"
         >
-          <Wand2 size={24} className="transition-transform duration-200 ease-out group-hover:-rotate-12 group-hover:translate-x-0.5" /> {text.submitButton}
+          <Wand2 size={24} className="transition-transform duration-200 ease-out group-hover:-rotate-12 group-hover:translate-x-0.5" /> {t.submitButton}
         </Button>
       </Form>
     </Card>
