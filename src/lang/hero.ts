@@ -12,7 +12,7 @@ export const HEROTEXT = {
       'Download as PDF',
     ],
     brochureFormTab: 'Brochure Form',
-    brochurePreviewTab: 'Brochure Preview',
+    brochurePreviewTab: 'Preview',
   },
   es: {
     title: 'Genera folletos para tu negocio con el poder de la IA.',
@@ -27,6 +27,6 @@ export const HEROTEXT = {
       'Descargar como PDF',
     ],
     brochureFormTab: 'Formulario del Folleto',
-    brochurePreviewTab: 'Vista Previa del Folleto',
+    brochurePreviewTab: 'Vista Previa',
   },
 }

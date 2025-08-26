@@ -3,7 +3,9 @@ export const FORM_TEXT = {
     title: 'Brochure Settings',
     description: 'Customize your brochure with the following options:',
     companyNameLabel: 'Company Name',
+    companyNamePlaceholder: 'My Company',
     urlLabel: 'Website URL',
+    urlPlaceholder: 'https://example.com',
     languageLabel: 'Language',
     languageOptions: [
       { code: 'en', label: 'English' },
@@ -20,7 +22,9 @@ export const FORM_TEXT = {
     title: 'Configuración del Folleto',
     description: 'Personaliza tu folleto con las siguientes opciones:',
     companyNameLabel: 'Nombre de la Empresa',
+    companyNamePlaceholder: 'Mi Empresa',
     urlLabel: 'URL del sitio web',
+    urlPlaceholder: 'https://ejemplo.com',
     languageLabel: 'Idioma',
     languageOptions: [
       { code: 'es', label: 'ES Español' },
