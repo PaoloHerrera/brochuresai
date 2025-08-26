@@ -19,20 +19,19 @@ import { useState } from 'react'
 
 import { useLanguageStore } from '../../stores/useLanguageStore'
 import { useThemeStore } from '../../stores/useThemeStore'
-
-const languageOptions = [
-  { key: 'en', label: 'Inglés' },
-  { key: 'es', label: 'Español' },
-]
+import { NAVBAR_TEXT } from '../../lang/navbar'
+import { useTranslate } from '../../hooks/useTranslate'
 
 export const NavbarUI = () => {
   const { language, setLanguage } = useLanguageStore()
   const { theme, setTheme } = useThemeStore()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+  const { t } = useTranslate(NAVBAR_TEXT)
+
   return (
     <Navbar 
-      className="px-4 sm:px-6 lg:px-8 sticky top-0 z-40 bg-white/60 dark:bg-slate-900/60 backdrop-blur supports-[backdrop-filter]:bg-white/50 dark:supports-[backdrop-filter]:bg-slate-900/50 border-b border-slate-200/60 dark:border-slate-700/60"
+      className="h-16 sticky px-0 sm:px-6 lg:px-8 top-0 z-40 bg-white/60 dark:bg-slate-900/60 backdrop-blur supports-[backdrop-filter]:bg-white/50 dark:supports-[backdrop-filter]:bg-slate-900/50 border-b border-slate-200/60 dark:border-slate-700/60"
       maxWidth="full"
       onMenuOpenChange={setIsMenuOpen}
       isMenuOpen={isMenuOpen}
@@ -41,8 +40,8 @@ export const NavbarUI = () => {
       <NavbarContent justify="start" className="flex-1">
         <NavbarBrand>
           <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white">
-              <Zap size={14} />
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white">
+              <Zap size={18} />
             </span>
             <span className="font-semibold text-slate-800 dark:text-slate-100">BrochuresAI</span>
           </div>
@@ -92,7 +91,7 @@ export const NavbarUI = () => {
               setLanguage(selected)
             }}
           >
-            {languageOptions.map((option) => (
+            {t.languageOptions.map((option) => (
               <SelectItem key={option.key}>{option.label}</SelectItem>
             ))}
           </Select>
@@ -114,9 +113,9 @@ export const NavbarUI = () => {
       <NavbarMenu className="bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-slate-200 dark:border-slate-700">
         <NavbarMenuItem>
           <div className="flex items-center justify-between w-full py-2">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Tema</span>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t.theme}</span>
             <Switch
-              aria-label="Cambiar tema"
+              aria-label="Switch theme"
               size="md"
               isSelected={theme === 'dark'}
               onValueChange={(isSelected) => setTheme(isSelected ? 'dark' : 'light')}
@@ -127,7 +126,7 @@ export const NavbarUI = () => {
         </NavbarMenuItem>
         <NavbarMenuItem>
           <div className="w-full py-2">
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Idioma</p>
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{t.language}</p>
             <Select
               disallowEmptySelection={true}
               startContent={<LanguagesIcon className="text-slate-600 dark:text-slate-300" />}
@@ -142,7 +141,7 @@ export const NavbarUI = () => {
                 setLanguage(selected)
               }}
             >
-              {languageOptions.map((option) => (
+              {t.languageOptions.map((option) => (
                 <SelectItem key={option.key}>{option.label}</SelectItem>
               ))}
             </Select>
