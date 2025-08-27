@@ -8,7 +8,25 @@ import { FAQSection } from './components/sections/FAQSection'
 import { Footer } from './components/ui/Footer'
 import { Container } from './components/ui/Container'
 
+import { useEffect } from 'react'
+import { getBrochuresRemaining } from './services/getBrochuresRemaining'
+import { useAnonUserIdStore } from './stores/useAnonUserId'
+import { useBrochuresRemainingStore } from './stores/useBrochuresRemaining'
+
 function App() {
+
+  const {anonUserId, setAnonUserId} = useAnonUserIdStore()
+  const {setBrochuresRemaining} = useBrochuresRemainingStore()
+
+  useEffect(() => {
+    getBrochuresRemaining(anonUserId).then((res) => {
+      setBrochuresRemaining(res.brochures_remaining)
+      setAnonUserId(res.anon_id)
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+
   return (
     <>
       <div className="bg-gray-100 dark:bg-slate-950">
