@@ -1,6 +1,7 @@
 export const FORM_TEXT = {
   en: {
     title: 'Brochure Settings',
+    remainingTooltip: 'Number of brochures remaining today',
     description: 'Customize your brochure with the following options:',
     companyNameLabel: 'Company Name',
     companyNamePlaceholder: 'My Company',
@@ -20,6 +21,7 @@ export const FORM_TEXT = {
   },
   es: {
     title: 'Configuración del Folleto',
+    remainingTooltip: 'Número de folletos restantes hoy',
     description: 'Personaliza tu folleto con las siguientes opciones:',
     companyNameLabel: 'Nombre de la Empresa',
     companyNamePlaceholder: 'Mi Empresa',
