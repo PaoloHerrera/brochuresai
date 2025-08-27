@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 import { useState } from 'react'
-import { Globe, Wand2, Briefcase, Smile } from 'lucide-react'
+import { Globe, Wand2, Briefcase, Smile, Gauge } from 'lucide-react'
 
 import {
   Card,
@@ -19,6 +19,9 @@ import { useTranslate } from '../../hooks/useTranslate'
 
 import axios from 'axios'
 
+import {useBrochuresRemainingStore} from '../../stores/useBrochuresRemaining'
+
+
 type BrochureType = 'professional' | 'funny'
 
 const BrochureForm: FC = () => {
@@ -30,7 +33,10 @@ const BrochureForm: FC = () => {
 
   // Brochure Store
   const { setBrochure, setCompanyName, setCacheKey } = useBrochureStore()
-
+ 
+  // Brochures Remaining Store
+  const {brochuresRemaining} = useBrochuresRemainingStore()
+ 
   // Estados controlados para Selects con tipos compatibles
   const [brochureLanguage, setBrochureLanguage] = useState(new Set([language] as LanguageStore[]))
   const [brochureType, setBrochureType] = useState(new Set(['professional'] as BrochureType[]))
@@ -42,6 +48,15 @@ const BrochureForm: FC = () => {
   const selectedType = Array.from(brochureType)[0] as BrochureType | undefined
   const brochureTypeIcon = selectedType === 'funny' ? <Smile size={16} /> : <Briefcase size={16} />
   const languageIcon = <Globe size={16} />
+
+  // Estilos dinámicos y valores para el indicador de "restantes"
+  const remaining = Math.max(0, brochuresRemaining)
+  // Estilos sutiles para el chip superior derecho
+  const badgeClasses = remaining <= 0
+    ? 'text-red-700 border-red-200 bg-red-50/60 dark:text-red-200 dark:border-red-500/30 dark:bg-red-500/10'
+    : remaining <= 2
+    ? 'text-amber-800 border-amber-200 bg-amber-50/60 dark:text-amber-200 dark:border-amber-500/30 dark:bg-amber-500/10'
+    : 'text-teal-800 border-teal-200 bg-teal-50/60 dark:text-teal-200 dark:border-teal-500/30 dark:bg-teal-500/10'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,10 +85,20 @@ const BrochureForm: FC = () => {
 
   return (
     <Card className="max-w-3xl mx-auto p-6 shadow-lg bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
-      <Form onSubmit={handleSubmit} className="flex flex-col gap-4 lg:gap-10">
-        <div className="flex items-center gap-2 text-2xl font-semibold">
-          <Globe className="text-blue-500" />
-          <span className="text-slate-900 dark:text-slate-100">{t.title}</span>
+      <Form onSubmit={handleSubmit} className="flex flex-col gap-6 lg:gap-10">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2 text-2xl font-semibold">
+            <Globe className="text-blue-500" />
+            <span className="text-slate-900 dark:text-slate-100">{t.title}</span>
+          </div>
+          <div
+            className={`ml-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${badgeClasses}`}
+            title={t.remainingTooltip}
+            aria-live="polite"
+          >
+            <Gauge size={14} className="opacity-80" />
+            <span className="tabular-nums">{remaining}</span>
+          </div>
         </div>
         <p className="text-gray-500 dark:text-slate-400 -mt-3 mb-2 text-sm">{t.description}</p>
         <div className='w-full'>
