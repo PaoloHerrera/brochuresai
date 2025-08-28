@@ -16,6 +16,7 @@ import {
 import { LanguagesIcon, Sun, Moon, Zap, Menu } from 'lucide-react'
 import { GithubIcon } from '../icons/GithubIcon'
 import { useState } from 'react'
+import { GITHUB_URL } from '../../config'
 
 import { useLanguageStore } from '../../stores/useLanguageStore'
 import { useThemeStore } from '../../stores/useThemeStore'
@@ -101,7 +102,7 @@ export const NavbarUI = () => {
             variant="flat"
             color="secondary"
             as={Link}
-            href="https://github.com"
+            href={GITHUB_URL}
             className="rounded-full bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:bg-white dark:hover:bg-slate-800"
           >
             <GithubIcon />
@@ -152,7 +153,7 @@ export const NavbarUI = () => {
             variant="flat"
             color="secondary"
             as={Link}
-            href="https://github.com"
+            href={GITHUB_URL}
             className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
             startContent={<GithubIcon />}
           >
