@@ -18,6 +18,10 @@ export const FORM_TEXT = {
       { value: 'funny', label: 'Funny' },
     ],
     submitButton: 'Generate Brochure',
+    errorTitle: 'Error',
+    errorDescription: 'An error occurred. Please try again later.',
+    limitBrochuresTitle: 'Limit Reached',
+    limitBrochuresDescription: 'You have reached the limit of brochures for today. Please try again tomorrow.',
   },
   es: {
     title: 'Configuración del Folleto',
@@ -29,8 +33,8 @@ export const FORM_TEXT = {
     urlPlaceholder: 'https://ejemplo.com',
     languageLabel: 'Idioma',
     languageOptions: [
-      { code: 'es', label: 'ES Español' },
-      { code: 'en', label: 'EN Inglés' },
+      { code: 'es', label: 'Español' },
+      { code: 'en', label: 'Inglés' },
     ],
     style: 'Estilo',
     styleOptions: [
@@ -38,5 +42,9 @@ export const FORM_TEXT = {
       { value: 'funny', label: 'Divertido' },
     ],
     submitButton: 'Generar Folleto',
+    errorTitle: 'Error',
+    errorDescription: 'Ocurrió un error. Por favor, inténtalo de nuevo más tarde.',
+    limitBrochuresTitle: 'Límite Alcanzado',
+    limitBrochuresDescription: 'Has alcanzado el límite de folletos para hoy. Por favor, inténtalo de nuevo mañana.',
   },
 }

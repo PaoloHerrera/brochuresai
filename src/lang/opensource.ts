@@ -1,7 +1,7 @@
 export const OPENSOURCE_TEXT = {
   en: {
-    eyebrow: 'Open Source',
-    title: 'Built in the open.',
+    eyebrow: 'Transparency is key',
+    title: 'Built in code open.',
     description:
       'This project is open source. Contributions are welcome — from bug fixes to new features and translations.',
     ctaPrimary: 'View on GitHub',
@@ -9,8 +9,8 @@ export const OPENSOURCE_TEXT = {
     badges: ['MIT License', 'Actively Maintained', 'Contributions Welcome'],
   },
   es: {
-    eyebrow: 'Código Abierto',
-    title: 'Construido en abierto.',
+    eyebrow: 'Transparencia ante todo',
+    title: 'Construido en código abierto.',
     description:
       'Este proyecto es open source. Las contribuciones son bienvenidas: desde correcciones hasta nuevas funciones y traducciones.',
     ctaPrimary: 'Ver en GitHub',
