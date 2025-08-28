@@ -2,8 +2,7 @@ import { Button, Link } from '@heroui/react'
 import { GithubIcon } from '../icons/GithubIcon'
 import { useTranslate } from '../../hooks/useTranslate'
 import { OPENSOURCE_TEXT } from '../../lang/opensource'
-
-const GITHUB_URL = 'https://github.com'
+import { GITHUB_URL } from '../../config'
 
 export const OpenSourceSection = () => {
   const { t } = useTranslate(OPENSOURCE_TEXT)
