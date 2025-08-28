@@ -1,74 +1,57 @@
-import { Button } from '@heroui/react'
-import { FileDown } from 'lucide-react'
+import { Button, addToast } from '@heroui/react'
+import { FileDown, CircleX } from 'lucide-react'
 import { useBrochureStore } from '../../stores/useBrochureStore'
-import { useLanguageStore } from '../../stores/useLanguageStore'
-import axios from 'axios'
+import { useBrochureDownload } from '../../hooks/useBrochureDownload'
+import { useTranslate } from '../../hooks/useTranslate'
+import { PREVIEW_TEXT } from '../../lang/preview'
 
 export const BrochurePreview = () => {
   const { brochure, cacheKey } = useBrochureStore()
-  const { language } = useLanguageStore()
-
-  const downloadLabel = language === 'es' ? 'Descargar PDF' : 'Download PDF'
-  const titleLabel = language === 'es' ? 'Vista previa del folleto' : 'Brochure preview'
+  const { isDownloading, downloadPdf } = useBrochureDownload()
+  const { t } = useTranslate(PREVIEW_TEXT)
 
   const handleDownloadPdf = async () => {
-    try {
-      /* ENVÍO DE LAS DATOS AL SERVIDOR */
+    if (!cacheKey) return
+    const result = await downloadPdf(cacheKey)
 
-      // Se obtiene la respuesta del servidor. El archivo PDF se descarga en el navegador
-      const response = await axios.post(
-        'http://localhost:8000/api/v1/download_brochure_pdf',
-        {
-          cache_key: cacheKey,
-        },
-        {
-          responseType: 'blob',
-          headers: {
-            Accept: 'application/pdf',
-          },
-        }
-      )
-
-      // Obtener el nombre del archivo
-      const disposition = response.headers['content-disposition']
-      let filename = 'brochure.pdf'
-
-      // Si el nombre del archivo está en la cabecera de la respuesta, entonces se extrae
-      if (disposition && disposition.includes('filename=')) {
-        filename = disposition.split('filename=')[1].split(';')[0]
-      }
-
-      // Crear un enlace para descargar el archivo
-      const link = document.createElement('a')
-      link.href = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
-      link.download = filename
-      link.click()
-      link.remove()
-      URL.revokeObjectURL(link.href)
-    } catch (error) {
-      console.error(error)
-      alert('Error al descargar el PDF')
+    if (!result.success) {
+      addToast({
+        title: t.errorTitle,
+        description: t.errorDescription,
+        color: 'danger',
+        icon: <CircleX color="white" />,
+      })
+      return
     }
+
+    // Crear un enlace para descargar el archivo
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(new Blob([result.blob], { type: 'application/pdf' }))
+    link.download = result.filename
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(link.href)
   }
 
   return (
     <div className="w-full rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900">
       <div className="flex items-center justify-between gap-3 px-3 py-2 bg-white/80 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-700 backdrop-blur">
-        <div className="text-sm font-medium text-slate-700 dark:text-slate-300">{titleLabel}</div>
+        <div className="text-sm font-medium text-slate-700 dark:text-slate-300">{t.title}</div>
         <Button
           size="sm"
           radius="full"
-          isDisabled={!brochure}
+          isDisabled={!brochure || isDownloading}
           className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:from-blue-700 hover:to-indigo-700"
           startContent={<FileDown size={16} />}
           onPress={handleDownloadPdf}
+          isLoading={isDownloading}
         >
-          {downloadLabel}
+          {t.downloadLabel}
         </Button>
       </div>
       <iframe
         className="block w-full max-w-full min-h-[24rem] h-[70vh] bg-white overflow-auto"
-        title="Brochure preview"
+        title={t.iframeTitle}
         srcDoc={brochure ?? ''}
         sandbox=""
         loading="lazy"
