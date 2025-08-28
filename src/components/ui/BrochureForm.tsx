@@ -1,8 +1,9 @@
 import type { FC } from 'react'
 import { useState } from 'react'
-import { Globe, Wand2, Briefcase, Smile, Gauge } from 'lucide-react'
+import { Globe, Wand2, Briefcase, Smile, Gauge, CircleX } from 'lucide-react'
 
 import {
+  addToast,
   Card,
   Form,
   Input,
@@ -13,36 +14,30 @@ import {
 
 import { useLanguageStore } from '../../stores/useLanguageStore'
 import type { LanguageStore } from '../../stores/useLanguageStore'
-import { useBrochureStore } from '../../stores/useBrochureStore'
 import { FORM_TEXT } from '../../lang/form'
 import { useTranslate } from '../../hooks/useTranslate'
 
-import axios from 'axios'
-
 import {useBrochuresRemainingStore} from '../../stores/useBrochuresRemaining'
+import { useBrochureSubmit } from '../../hooks/useBrochureSubmit'
 
 
 type BrochureType = 'professional' | 'funny'
 
 const BrochureForm: FC = () => {
   
-  // Language Store
+  // Language Store y traducciones
   const { language } = useLanguageStore()
-  const {t } = useTranslate(FORM_TEXT)
-  const languages = t.languageOptions
+  const { t } = useTranslate(FORM_TEXT)
 
-  // Brochure Store
-  const { setBrochure, setCompanyName, setCacheKey } = useBrochureStore()
- 
-  // Brochures Remaining Store
-  const {brochuresRemaining} = useBrochuresRemainingStore()
+  // Hook de envío (maneja toda la lógica de submit, toasts, stores, axios)
+  const { isLoading, submitBrochure } = useBrochureSubmit()
+
+  // Brochures Remaining Store (solo lectura para el badge)
+  const { brochuresRemaining } = useBrochuresRemainingStore()
  
   // Estados controlados para Selects con tipos compatibles
   const [brochureLanguage, setBrochureLanguage] = useState(new Set([language] as LanguageStore[]))
   const [brochureType, setBrochureType] = useState(new Set(['professional'] as BrochureType[]))
-
-  // Estado de carga cuando se envía el formulario
-  const [isLoading, setIsLoading] = useState(false)
 
   // Iconos dinámicos para los triggers de los Selects
   const selectedType = Array.from(brochureType)[0] as BrochureType | undefined
@@ -60,27 +55,35 @@ const BrochureForm: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    /* ENVÍO DE LAS DATOS AL SERVIDOR */
-    setIsLoading(true)
-    setBrochure('')
-
-    const companyNameHtml = (e.target as HTMLFormElement).elements.namedItem('companyName') as HTMLInputElement
-    const urlHtml = (e.target as HTMLFormElement).elements.namedItem('url') as HTMLInputElement
-
+    const form = e.target as HTMLFormElement
+    const companyNameHtml = form.elements.namedItem('companyName') as HTMLInputElement
+    const urlHtml = form.elements.namedItem('url') as HTMLInputElement
     const brochureFullLanguage = t.languageOptions.find((lang) => lang.code === Array.from(brochureLanguage)[0])?.label
 
-    const response = await axios.post('http://localhost:8000/api/v1/create_brochure', {
-      "company_name": companyNameHtml.value,
-      "url": urlHtml.value,
-      "language": brochureFullLanguage,
-      "brochure_type": Array.from(brochureType)[0],
+    const result = await submitBrochure({
+      companyName: companyNameHtml.value,
+      url: urlHtml.value,
+      language: brochureFullLanguage ?? '',
+      brochureType: Array.from(brochureType)[0] as 'professional' | 'funny',
     })
 
-    setBrochure(response.data.brochure)
-    setCompanyName(companyNameHtml.value)
-    setCacheKey(response.data.cache_key)
-    setIsLoading(false)
+    if (!result.success) {
+      if (result.status === 429) {
+        addToast({
+          title: t.limitBrochuresTitle,
+          description: t.limitBrochuresDescription,
+          color: 'danger',
+          icon: <CircleX color="white" />,
+        })
+      } else {
+        addToast({
+          title: t.errorTitle,
+          description: t.errorDescription,
+          color: 'danger',
+          icon: <CircleX color="white" />,
+        })
+      }
+    }
   }
 
   return (
@@ -108,10 +111,13 @@ const BrochureForm: FC = () => {
           <Input
             name="companyName"
             isDisabled={isLoading}
-            placeholder={t.companyNamePlaceholder} isRequired classNames={{
-            inputWrapper: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
-            input: 'text-slate-900 dark:text-slate-100'
-          }} />
+            placeholder={t.companyNamePlaceholder} 
+            isRequired 
+            classNames={{
+              inputWrapper: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
+              input: 'text-slate-900 dark:text-slate-100'
+            }} 
+          />
         </div>
         <div className="w-full">
           <label className="block text-sm font-medium mb-1 text-slate-800 dark:text-slate-300">
@@ -120,10 +126,14 @@ const BrochureForm: FC = () => {
           <Input
             name="url"
             isDisabled={isLoading}
-            placeholder={t.urlPlaceholder} type="url" isRequired classNames={{
-            inputWrapper: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
-            input: 'text-slate-900 dark:text-slate-100'
-          }} />
+            placeholder={t.urlPlaceholder} 
+            type="url" 
+            isRequired 
+            classNames={{
+              inputWrapper: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
+              input: 'text-slate-900 dark:text-slate-100'
+            }} 
+          />
         </div>
         <div className="flex gap-4 w-full lg:flex-row flex-col">
           <div className="flex-1">
@@ -178,7 +188,7 @@ const BrochureForm: FC = () => {
                 trigger: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100'
               }}
             >
-              {languages.map((lang) => (
+              {t.languageOptions.map((lang) => (
                 <SelectItem key={lang.code}>{lang.label}</SelectItem>
               ))}
             </Select>
@@ -189,7 +199,8 @@ const BrochureForm: FC = () => {
           type="submit"
           className="group relative mt-3 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-4 text-white text-lg font-semibold shadow-lg shadow-blue-600/20 transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full sm:w-auto"
         >
-          <Wand2 size={24} className="transition-transform duration-200 ease-out group-hover:-rotate-12 group-hover:translate-x-0.5" /> {t.submitButton}
+          <Wand2 size={24} className="transition-transform duration-200 ease-out group-hover:-rotate-12 group-hover:translate-x-0.5" /> 
+          {t.submitButton}
         </Button>
       </Form>
     </Card>
