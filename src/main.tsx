@@ -2,13 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import { HeroUIProvider } from '@heroui/react'
+import { Providers } from './providers.tsx'
 
 export function Root() {
   return (
-    <HeroUIProvider>
+    <Providers>
       <App />
-    </HeroUIProvider>
+    </Providers>
   )
 }
 
