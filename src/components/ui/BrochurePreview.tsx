@@ -1,5 +1,6 @@
-import { Button, addToast } from '@heroui/react'
-import { FileDown, CircleX } from 'lucide-react'
+import { Button } from '@heroui/react'
+import { FileDown } from 'lucide-react'
+import { showErrorToast } from '../../utils/toasts'
 import { useBrochureStore } from '../../stores/useBrochureStore'
 import { useBrochureDownload } from '../../hooks/useBrochureDownload'
 import { useTranslate } from '../../hooks/useTranslate'
@@ -15,23 +16,21 @@ export const BrochurePreview = () => {
     const result = await downloadPdf(cacheKey)
 
     if (!result.success) {
-      addToast({
-        title: t.errorTitle,
-        description: t.errorDescription,
-        color: 'danger',
-        icon: <CircleX color="white" />,
-      })
+      showErrorToast(t.errorTitle, t.errorDescription)
       return
     }
 
     // Crear un enlace para descargar el archivo
     const link = document.createElement('a')
-    link.href = URL.createObjectURL(new Blob([result.blob], { type: 'application/pdf' }))
+    const objectUrl = URL.createObjectURL(new Blob([result.blob], { type: 'application/pdf' }))
+    link.href = objectUrl
     link.download = result.filename
     link.click()
     link.remove()
-    URL.revokeObjectURL(link.href)
+    URL.revokeObjectURL(objectUrl)
   }
+
+  const isDownloadDisabled = !brochure || !cacheKey || isDownloading
 
   return (
     <div className="w-full rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900">
@@ -40,7 +39,7 @@ export const BrochurePreview = () => {
         <Button
           size="sm"
           radius="full"
-          isDisabled={!brochure || isDownloading}
+          isDisabled={isDownloadDisabled}
           className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:from-blue-700 hover:to-indigo-700"
           startContent={<FileDown size={16} />}
           onPress={handleDownloadPdf}

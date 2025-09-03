@@ -1,16 +1,17 @@
 import type { FC } from 'react'
 import { useState } from 'react'
-import { Globe, Wand2, Briefcase, Smile, Gauge, CircleX } from 'lucide-react'
+import { Globe, Wand2, Briefcase, Smile, Gauge } from 'lucide-react'
 
 import {
-  addToast,
   Card,
   Form,
   Input,
   Button,
   Select,
   SelectItem,
+  Tooltip,
 } from '@heroui/react'
+import { showErrorToast } from '../../utils/toasts'
 
 import { useLanguageStore } from '../../stores/useLanguageStore'
 import type { LanguageStore } from '../../stores/useLanguageStore'
@@ -19,6 +20,7 @@ import { useTranslate } from '../../hooks/useTranslate'
 
 import {useBrochuresRemainingStore} from '../../stores/useBrochuresRemaining'
 import { useBrochureSubmit } from '../../hooks/useBrochureSubmit'
+import { inputClassNames, textDefault, fieldWrapper } from './fieldStyles'
 
 
 type BrochureType = 'professional' | 'funny'
@@ -58,30 +60,19 @@ const BrochureForm: FC = () => {
     const form = e.target as HTMLFormElement
     const companyNameHtml = form.elements.namedItem('companyName') as HTMLInputElement
     const urlHtml = form.elements.namedItem('url') as HTMLInputElement
-    const brochureFullLanguage = t.languageOptions.find((lang) => lang.code === Array.from(brochureLanguage)[0])?.label
 
     const result = await submitBrochure({
       companyName: companyNameHtml.value,
       url: urlHtml.value,
-      language: brochureFullLanguage ?? '',
+      language: Array.from(brochureLanguage)[0] as LanguageStore,
       brochureType: Array.from(brochureType)[0] as 'professional' | 'funny',
     })
 
     if (!result.success) {
       if (result.status === 429) {
-        addToast({
-          title: t.limitBrochuresTitle,
-          description: t.limitBrochuresDescription,
-          color: 'danger',
-          icon: <CircleX color="white" />,
-        })
+        showErrorToast(t.limitBrochuresTitle, t.limitBrochuresDescription)
       } else {
-        addToast({
-          title: t.errorTitle,
-          description: t.errorDescription,
-          color: 'danger',
-          icon: <CircleX color="white" />,
-        })
+        showErrorToast(t.errorTitle, t.errorDescription)
       }
     }
   }
@@ -113,10 +104,7 @@ const BrochureForm: FC = () => {
             isDisabled={isLoading}
             placeholder={t.companyNamePlaceholder} 
             isRequired 
-            classNames={{
-              inputWrapper: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
-              input: 'text-slate-900 dark:text-slate-100'
-            }} 
+            classNames={inputClassNames}
           />
         </div>
         <div className="w-full">
@@ -129,10 +117,7 @@ const BrochureForm: FC = () => {
             placeholder={t.urlPlaceholder} 
             type="url" 
             isRequired 
-            classNames={{
-              inputWrapper: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
-              input: 'text-slate-900 dark:text-slate-100'
-            }} 
+            classNames={inputClassNames}
           />
         </div>
         <div className="flex gap-4 w-full lg:flex-row flex-col">
@@ -141,7 +126,7 @@ const BrochureForm: FC = () => {
               {t.style}
             </label>
             <Select
-              aria-label="Select brochure type"
+              aria-label={t.ariaSelectType}
               isDisabled={isLoading}
               selectedKeys={brochureType}
               startContent={brochureTypeIcon}
@@ -154,7 +139,7 @@ const BrochureForm: FC = () => {
               disallowEmptySelection={true}
               isRequired
               classNames={{
-                trigger: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100'
+                trigger: `${fieldWrapper} ${textDefault}`,
               }}
             >
               {t.styleOptions.map((opt) => (
@@ -172,7 +157,7 @@ const BrochureForm: FC = () => {
               {t.languageLabel}
             </label>
             <Select
-              aria-label="Select language"
+              aria-label={t.ariaSelectLanguage}
               isDisabled={isLoading}
               className="w-full"
               disallowEmptySelection={true}
@@ -185,7 +170,7 @@ const BrochureForm: FC = () => {
               }}
               isRequired
               classNames={{
-                trigger: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100'
+                trigger: `${fieldWrapper} ${textDefault}`,
               }}
             >
               {t.languageOptions.map((lang) => (
@@ -194,14 +179,23 @@ const BrochureForm: FC = () => {
             </Select>
           </div>
         </div>
-        <Button
-          isLoading={isLoading}
-          type="submit"
-          className="group relative mt-3 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-4 text-white text-lg font-semibold shadow-lg shadow-blue-600/20 transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full sm:w-auto"
+        <Tooltip
+          isDisabled={remaining > 0}
+          content={t.limitBrochuresDescription}
+          placement="top"
         >
-          <Wand2 size={24} className="transition-transform duration-200 ease-out group-hover:-rotate-12 group-hover:translate-x-0.5" /> 
-          {t.submitButton}
-        </Button>
+          <div className="inline-flex">
+            <Button
+              isLoading={isLoading}
+              isDisabled={remaining <= 0}
+              type="submit"
+              className="group relative mt-3 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-4 text-white text-lg font-semibold shadow-lg shadow-blue-600/20 transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <Wand2 size={24} className="transition-transform duration-200 ease-out group-hover:-rotate-12 group-hover:translate-x-0.5" /> 
+              {t.submitButton}
+            </Button>
+          </div>
+        </Tooltip>
       </Form>
     </Card>
   )
