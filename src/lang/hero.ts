@@ -13,6 +13,7 @@ export const HEROTEXT = {
     ],
     brochureFormTab: 'Brochure Form',
     brochurePreviewTab: 'Preview',
+    tabsAria: 'Brochure navigation tabs',
   },
   es: {
     title: 'Genera folletos para tu negocio con el poder de la IA.',
@@ -28,5 +29,6 @@ export const HEROTEXT = {
     ],
     brochureFormTab: 'Formulario del Folleto',
     brochurePreviewTab: 'Vista Previa',
+    tabsAria: 'Pestañas de navegación del folleto',
   },
 }

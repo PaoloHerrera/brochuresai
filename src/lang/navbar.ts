@@ -6,6 +6,13 @@ export const NAVBAR_TEXT = {
     ],
     theme: 'Theme',
     language: 'Language',
+    closeMenu: 'Close menu',
+    openMenu: 'Open menu',
+    changeTheme: 'Change theme',
+    selectLanguage: 'Select language',
+    brand: 'BrochuresAI',
+    github: 'GitHub',
+    
   },
   es: {
     languageOptions: [
@@ -14,5 +21,11 @@ export const NAVBAR_TEXT = {
     ],
     theme: 'Tema',
     language: 'Idioma',
+    closeMenu: 'Cerrar menú',
+    openMenu: 'Abrir menú',
+    changeTheme: 'Cambiar tema',
+    selectLanguage: 'Seleccionar idioma',
+    brand: 'BrochuresAI',
+    github: 'GitHub',
   },
 }

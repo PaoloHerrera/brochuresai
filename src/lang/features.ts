@@ -12,6 +12,8 @@ export const FEATURES_TEXT = {
       { title: 'Custom styles', description: 'Choose between professional or fun styles, and switch language easily.' },
       { title: 'Privacy first', description: 'Your content is processed with care and never used to train third parties.' },
     ],
+    prevAria: 'Previous',
+    nextAria: 'Next',
   },
   es: {
     eyebrow: '¿Por qué BrochuresAI?',
@@ -26,5 +28,7 @@ export const FEATURES_TEXT = {
       { title: 'Estilos personalizables', description: 'Elige entre un estilo profesional o divertido, y cambia de idioma fácilmente.' },
       { title: 'Privacidad ante todo', description: 'Tu contenido se procesa con cuidado y nunca se usa para entrenar a terceros.' },
     ],
+    prevAria: 'Anterior',
+    nextAria: 'Siguiente',
   },
 }
