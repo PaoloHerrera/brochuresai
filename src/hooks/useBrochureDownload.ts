@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { API_BASE_URL } from '../config'
 
@@ -8,9 +8,22 @@ export type DownloadResult =
 
 export const useBrochureDownload = () => {
   const [isDownloading, setIsDownloading] = useState(false)
+  const controllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.abort()
+    }
+  }, [])
 
   const downloadPdf = async (cacheKey: string): Promise<DownloadResult> => {
     setIsDownloading(true)
+
+    // Cancel any previous in-flight download before starting a new one
+    controllerRef.current?.abort()
+    const controller = new AbortController()
+    controllerRef.current = controller
+
     try {
       const response = await axios.post(
         `${API_BASE_URL}/api/v1/download_brochure_pdf`,
@@ -18,6 +31,8 @@ export const useBrochureDownload = () => {
         {
           responseType: 'blob',
           headers: { Accept: 'application/pdf' },
+          signal: controller.signal,
+          timeout: 10_000, // 10s timeout for download
         }
       )
 
@@ -39,6 +54,7 @@ export const useBrochureDownload = () => {
       return { success: false, error }
     } finally {
       setIsDownloading(false)
+      controllerRef.current = null
     }
   }
 

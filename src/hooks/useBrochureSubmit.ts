@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { API_BASE_URL } from '../config'
 
 import { useBrochureStore } from '../stores/useBrochureStore'
 import { useBrochuresRemainingStore } from '../stores/useBrochuresRemaining'
 import { useAnonUserIdStore } from '../stores/useAnonUserId'
+import type {LanguageStore} from '../stores/useLanguageStore'
 
 export interface BrochureSubmitData {
   companyName: string
   url: string
-  language: string
+  language: LanguageStore
   brochureType: 'professional' | 'funny'
 }
 
@@ -19,24 +20,43 @@ export type BrochureSubmitResult =
 
 export const useBrochureSubmit = () => {
   const [isLoading, setIsLoading] = useState(false)
+  const controllerRef = useRef<AbortController | null>(null)
 
   // Stores
   const { setBrochure, setCompanyName, setCacheKey } = useBrochureStore()
   const { setBrochuresRemaining } = useBrochuresRemainingStore()
   const { anonUserId } = useAnonUserIdStore()
 
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.abort()
+    }
+  }, [])
+
   const submitBrochure = async (data: BrochureSubmitData): Promise<BrochureSubmitResult> => {
     setIsLoading(true)
     setBrochure('')
 
+    // Cancel any previous in-flight request before starting a new one
+    controllerRef.current?.abort()
+    const controller = new AbortController()
+    controllerRef.current = controller
+
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/v1/create_brochure`, {
-        anon_id: anonUserId,
-        company_name: data.companyName,
-        url: data.url,
-        language: data.language,
-        brochure_type: data.brochureType,
-      })
+      const response = await axios.post(
+        `${API_BASE_URL}/api/v1/create_brochure`,
+        {
+          anon_id: anonUserId,
+          company_name: data.companyName,
+          url: data.url,
+          language: data.language,
+          brochure_type: data.brochureType,
+        },
+        {
+          signal: controller.signal,
+          timeout: 120_000, // 120s timeout
+        }
+      )
 
       setBrochure(response.data.brochure)
       setCompanyName(data.companyName)
@@ -51,6 +71,8 @@ export const useBrochureSubmit = () => {
       return { success: false, error }
     } finally {
       setIsLoading(false)
+      // Clear controller ref after request finishes/cancels
+      controllerRef.current = null
     }
   }
 
