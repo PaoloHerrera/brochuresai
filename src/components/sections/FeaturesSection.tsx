@@ -72,7 +72,7 @@ export const FeaturesSection = () => {
               variant="flat"
               className="bg-white/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 shadow-sm"
               onPress={() => sliderRef.current?.slickPrev()}
-              aria-label="Prev"
+              aria-label={t.prevAria}
             >
               <ChevronLeft size={18} />
             </Button>
@@ -117,7 +117,7 @@ export const FeaturesSection = () => {
               variant="flat"
               className="bg-white/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 shadow-sm"
               onPress={() => sliderRef.current?.slickNext()}
-              aria-label="Next"
+              aria-label={t.nextAria}
             >
               <ChevronRight size={18} />
             </Button>

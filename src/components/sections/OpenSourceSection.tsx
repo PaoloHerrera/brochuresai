@@ -26,7 +26,7 @@ export const OpenSourceSection = () => {
 
         <div className="flex items-center justify-center gap-4">
           <Button as={Link} href={GITHUB_URL} color="secondary" variant="flat" className="rounded-full text-slate-200">
-            <GithubIcon /> {t.ctaPrimary}
+            <GithubIcon ariaLabel={t.ctaPrimary} title={t.ctaPrimary} /> {t.ctaPrimary}
           </Button>
           <Button as={Link} href={GITHUB_URL} variant="bordered" className="rounded-full border-cyan-400/40 text-slate-200">
             {t.ctaSecondary}

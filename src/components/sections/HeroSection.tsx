@@ -62,7 +62,7 @@ export const HeroSection = () => {
         <div className="relative w-full lg:ml-auto overflow-hidden">
           <Tabs
           className='w-full'
-          aria-label='brochure-tabs' classNames={
+          aria-label={t.tabsAria} classNames={
             {
               tabList: "w-full relative rounded-none p-0 mx-1 border-b border-divider gap-0",
               cursor: "w-full bg-[#22d3ee]",
