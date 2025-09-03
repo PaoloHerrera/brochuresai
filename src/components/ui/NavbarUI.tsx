@@ -22,6 +22,7 @@ import { useLanguageStore } from '../../stores/useLanguageStore'
 import { useThemeStore } from '../../stores/useThemeStore'
 import { NAVBAR_TEXT } from '../../lang/navbar'
 import { useTranslate } from '../../hooks/useTranslate'
+import { fieldWrapperTranslucent, textMuted } from './fieldStyles'
 
 export const NavbarUI = () => {
   const { language, setLanguage } = useLanguageStore()
@@ -44,7 +45,7 @@ export const NavbarUI = () => {
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white">
               <Zap size={18} />
             </span>
-            <span className="font-semibold text-slate-800 dark:text-slate-100">BrochuresAI</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-100">{t.brand}</span>
           </div>
         </NavbarBrand>
       </NavbarContent>
@@ -55,7 +56,7 @@ export const NavbarUI = () => {
           isIconOnly
           variant="light"
           radius="full"
-          aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-label={isMenuOpen ? t.closeMenu : t.openMenu}
           className="text-slate-800 dark:text-slate-100"
           onPress={() => setIsMenuOpen((v) => !v)}
         >
@@ -67,7 +68,7 @@ export const NavbarUI = () => {
       <NavbarContent justify="end" className="hidden sm:flex gap-3">
         <NavbarItem>
           <Switch
-            aria-label="Cambiar tema"
+            aria-label={t.changeTheme}
             size="lg"
             isSelected={theme === 'dark'}
             onValueChange={(isSelected) => setTheme(isSelected ? 'dark' : 'light')}
@@ -78,13 +79,13 @@ export const NavbarUI = () => {
         </NavbarItem>
         <NavbarItem>
           <Select
-            aria-label="Select language"
+            aria-label={t.selectLanguage}
             disallowEmptySelection={true}
             startContent={<LanguagesIcon className="text-slate-600 dark:text-slate-300" />}
-            defaultSelectedKeys={[language]}
+            selectedKeys={[language]}
             className="w-36"
             classNames={{
-              trigger: 'rounded-full bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200',
+              trigger: `${fieldWrapperTranslucent} ${textMuted}`,
               value: 'text-sm',
             }}
             onSelectionChange={(keys) => {
@@ -105,8 +106,8 @@ export const NavbarUI = () => {
             href={GITHUB_URL}
             className="rounded-full bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:bg-white dark:hover:bg-slate-800"
           >
-            <GithubIcon />
-            GitHub
+            <GithubIcon ariaLabel={t.github} title={t.github} />
+            {t.github}
           </Button>
         </NavbarItem>
       </NavbarContent>
@@ -116,7 +117,7 @@ export const NavbarUI = () => {
           <div className="flex items-center justify-between w-full py-2">
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t.theme}</span>
             <Switch
-              aria-label="Switch theme"
+              aria-label={t.changeTheme}
               size="md"
               isSelected={theme === 'dark'}
               onValueChange={(isSelected) => setTheme(isSelected ? 'dark' : 'light')}
@@ -129,12 +130,13 @@ export const NavbarUI = () => {
           <div className="w-full py-2">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{t.language}</p>
             <Select
+              aria-label={t.selectLanguage}
               disallowEmptySelection={true}
               startContent={<LanguagesIcon className="text-slate-600 dark:text-slate-300" />}
-              defaultSelectedKeys={[language]}
+              selectedKeys={[language]}
               className="w-full"
               classNames={{
-                trigger: 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200',
+                trigger: `${fieldWrapperTranslucent} ${textMuted}`,
                 value: 'text-sm',
               }}
               onSelectionChange={(keys) => {
@@ -155,9 +157,9 @@ export const NavbarUI = () => {
             as={Link}
             href={GITHUB_URL}
             className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
-            startContent={<GithubIcon />}
+            startContent={<GithubIcon ariaLabel={t.github} title={t.github} />}
           >
-            GitHub
+            {t.github}
           </Button>
         </NavbarMenuItem>
       </NavbarMenu>
