@@ -19,12 +19,22 @@ function App() {
   const {setBrochuresRemaining} = useBrochuresRemainingStore()
 
   useEffect(() => {
+    let cancelled = false
     getBrochuresRemaining(anonUserId).then((res) => {
-      setBrochuresRemaining(res.brochures_remaining)
-      setAnonUserId(res.anon_id)
+      if (cancelled) return
+      if (res && res.success) {
+        setBrochuresRemaining(res.data.brochures_remaining)
+        setAnonUserId(res.data.anon_id)
+      } else {
+        // Fallback seguro si hay error: no sobreescribir si ya existe, o setear mínimos
+        // Podríamos mostrar un toast en el futuro; por ahora, solo no crashear.
+        // setBrochuresRemaining(0)
+      }
+    }).catch(() => {
+      // Evitar crash si se rechaza la promesa
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    return () => { cancelled = true }
+  }, [anonUserId, setAnonUserId, setBrochuresRemaining])
 
 
   return (
