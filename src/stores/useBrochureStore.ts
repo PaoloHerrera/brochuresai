@@ -1,6 +1,6 @@
 import {create} from 'zustand'
 
-interface BrochureState {
+export interface BrochureState {
   companyName: string
   brochure: string
   cacheKey: string
