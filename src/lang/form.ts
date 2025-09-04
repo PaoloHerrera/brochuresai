@@ -24,6 +24,8 @@ export const FORM_TEXT = {
     errorDescription: 'It was not possible to generate the brochure. Please try again or try with another website.',
     limitBrochuresTitle: 'Limit Reached',
     limitBrochuresDescription: 'You have reached the limit of brochures for today. Please try again tomorrow.',
+    successTitle: 'Brochure ready',
+    successDescription: 'Your brochure has been generated successfully and is available in the preview tab.',
   },
   es: {
     title: 'Configuración del Folleto',
@@ -50,5 +52,7 @@ export const FORM_TEXT = {
     errorDescription: 'No fue posible generar el folleto. Por favor, inténtelo de nuevo o pruebe con otra página web.',
     limitBrochuresTitle: 'Límite Alcanzado',
     limitBrochuresDescription: 'Has alcanzado el límite de folletos para hoy. Por favor, inténtalo de nuevo mañana.',
+    successTitle: '¡Folleto listo!',
+    successDescription: 'Tu folleto se ha generado correctamente y está disponible en la pestaña de vista previa.',
   },
 }
