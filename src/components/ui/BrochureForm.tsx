@@ -12,6 +12,7 @@ import {
   Tooltip,
 } from '@heroui/react'
 import { showErrorToast } from '../../utils/toasts'
+import { showSuccessToast } from '../../utils/toasts'
 
 import { useLanguageStore } from '../../stores/useLanguageStore'
 import type { LanguageStore } from '../../stores/useLanguageStore'
@@ -19,20 +20,22 @@ import { FORM_TEXT } from '../../lang/form'
 import { useTranslate } from '../../hooks/useTranslate'
 
 import {useBrochuresRemainingStore} from '../../stores/useBrochuresRemaining'
-import { useBrochureSubmit } from '../../hooks/useBrochureSubmit'
+import type { BrochureSubmitData, BrochureSubmitResult } from '../../hooks/useBrochureSubmit'
 import { inputClassNames, textDefault, fieldWrapper } from './fieldStyles'
 
 
 type BrochureType = 'professional' | 'funny'
 
-const BrochureForm: FC = () => {
+interface BrochureFormProps {
+  isLoading: boolean
+  submitBrochure: (data: BrochureSubmitData) => Promise<BrochureSubmitResult>
+}
+
+const BrochureForm: FC<BrochureFormProps> = ({ isLoading, submitBrochure }) => {
   
   // Language Store y traducciones
   const { language } = useLanguageStore()
   const { t } = useTranslate(FORM_TEXT)
-
-  // Hook de envío (maneja toda la lógica de submit, toasts, stores, axios)
-  const { isLoading, submitBrochure } = useBrochureSubmit()
 
   // Brochures Remaining Store (solo lectura para el badge)
   const { brochuresRemaining } = useBrochuresRemainingStore()
@@ -74,6 +77,8 @@ const BrochureForm: FC = () => {
       } else {
         showErrorToast(t.errorTitle, t.errorDescription)
       }
+    } else {
+      showSuccessToast(t.successTitle, t.successDescription)
     }
   }
 
