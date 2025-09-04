@@ -8,11 +8,13 @@ import BrochureForm from '../ui/BrochureForm'
 import { useBrochureStore } from '../../stores/useBrochureStore'
 
 import { BrochurePreview } from '../ui/BrochurePreview'
+import { useBrochureSubmit } from '../../hooks/useBrochureSubmit'
 
 export const HeroSection = () => {
   const { t } = useTranslate(HEROTEXT)
 
   const { brochure } = useBrochureStore()
+  const { isLoading, submitBrochure } = useBrochureSubmit()
 
   const chipIcons = [
     <CheckCircle2 key="c1" size={14} />, 
@@ -31,6 +33,13 @@ export const HeroSection = () => {
       setSelectedTab('brochure-form')
     }
   }, [brochure])
+
+  // Si comienza la carga, mostramos el skeleton en la pestaña de preview inmediatamente
+  useEffect(() => {
+    if (isLoading) {
+      setSelectedTab('brochure-preview')
+    }
+  }, [isLoading])
 
   return (
     <section className="relative overflow-hidden min-h-[calc(100svh-4rem)] py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
@@ -82,7 +91,7 @@ export const HeroSection = () => {
                 </span>
               </div>
             }>
-              <BrochureForm />
+              <BrochureForm isLoading={isLoading} submitBrochure={submitBrochure} />
             </Tab>
             <Tab key="brochure-preview" title={
               <div className="flex items-center gap-2">
@@ -92,10 +101,10 @@ export const HeroSection = () => {
                 </span>
               </div>
             }
-            isDisabled={brochure.length === 0}
+            isDisabled={brochure.length === 0 && !isLoading}
             >
               <div className="w-full overflow-x-hidden">
-                <BrochurePreview />
+                <BrochurePreview isLoading={isLoading} />
               </div>
             </Tab>
           </Tabs>
