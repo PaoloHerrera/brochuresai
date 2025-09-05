@@ -1,5 +1,4 @@
-import type { FC } from 'react'
-import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { Globe, Wand2, Briefcase, Smile, Gauge } from 'lucide-react'
 
 import {
@@ -11,16 +10,12 @@ import {
   SelectItem,
   Tooltip,
 } from '@heroui/react'
-import { showErrorToast } from '../../utils/toasts'
-import { showSuccessToast } from '../../utils/toasts'
 
-import { useLanguageStore } from '../../stores/useLanguageStore'
 import type { LanguageStore } from '../../stores/useLanguageStore'
 import { FORM_TEXT } from '../../lang/form'
 import { useTranslate } from '../../hooks/useTranslate'
 
-import {useBrochuresRemainingStore} from '../../stores/useBrochuresRemaining'
-import type { BrochureSubmitData, BrochureSubmitResult } from '../../hooks/useBrochureSubmit'
+import { useBrochuresRemainingStore } from '../../stores/useBrochuresRemaining'
 import { inputClassNames, textDefault, fieldWrapper } from './fieldStyles'
 
 
@@ -28,25 +23,36 @@ type BrochureType = 'professional' | 'funny'
 
 interface BrochureFormProps {
   isLoading: boolean
-  submitBrochure: (data: BrochureSubmitData) => Promise<BrochureSubmitResult>
+  companyName: string
+  url: string
+  language: LanguageStore
+  brochureType: BrochureType
+  onCompanyNameChange: (v: string) => void
+  onUrlChange: (v: string) => void
+  onLanguageChange: (v: LanguageStore) => void
+  onBrochureTypeChange: (v: BrochureType) => void
+  onSubmit: () => void | Promise<void>
 }
 
-const BrochureForm: FC<BrochureFormProps> = ({ isLoading, submitBrochure }) => {
-  
-  // Language Store y traducciones
-  const { language } = useLanguageStore()
+const BrochureForm = ({
+  isLoading,
+  companyName,
+  url,
+  language,
+  brochureType,
+  onCompanyNameChange,
+  onUrlChange,
+  onLanguageChange,
+  onBrochureTypeChange,
+  onSubmit,
+}: BrochureFormProps) => {
   const { t } = useTranslate(FORM_TEXT)
 
   // Brochures Remaining Store (solo lectura para el badge)
   const { brochuresRemaining } = useBrochuresRemainingStore()
- 
-  // Estados controlados para Selects con tipos compatibles
-  const [brochureLanguage, setBrochureLanguage] = useState(new Set([language] as LanguageStore[]))
-  const [brochureType, setBrochureType] = useState(new Set(['professional'] as BrochureType[]))
 
   // Iconos dinámicos para los triggers de los Selects
-  const selectedType = Array.from(brochureType)[0] as BrochureType | undefined
-  const brochureTypeIcon = selectedType === 'funny' ? <Smile size={16} /> : <Briefcase size={16} />
+  const brochureTypeIcon = brochureType === 'funny' ? <Smile size={16} /> : <Briefcase size={16} />
   const languageIcon = <Globe size={16} />
 
   // Estilos dinámicos y valores para el indicador de "restantes"
@@ -58,28 +64,9 @@ const BrochureForm: FC<BrochureFormProps> = ({ isLoading, submitBrochure }) => {
     ? 'text-amber-800 border-amber-200 bg-amber-50/60 dark:text-amber-200 dark:border-amber-500/30 dark:bg-amber-500/10'
     : 'text-teal-800 border-teal-200 bg-teal-50/60 dark:text-teal-200 dark:border-teal-500/30 dark:bg-teal-500/10'
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    const form = e.target as HTMLFormElement
-    const companyNameHtml = form.elements.namedItem('companyName') as HTMLInputElement
-    const urlHtml = form.elements.namedItem('url') as HTMLInputElement
-
-    const result = await submitBrochure({
-      companyName: companyNameHtml.value,
-      url: urlHtml.value,
-      language: Array.from(brochureLanguage)[0] as LanguageStore,
-      brochureType: Array.from(brochureType)[0] as 'professional' | 'funny',
-    })
-
-    if (!result.success) {
-      if (result.status === 429) {
-        showErrorToast(t.limitBrochuresTitle, t.limitBrochuresDescription)
-      } else {
-        showErrorToast(t.errorTitle, t.errorDescription)
-      }
-    } else {
-      showSuccessToast(t.successTitle, t.successDescription)
-    }
+    await onSubmit()
   }
 
   return (
@@ -110,6 +97,8 @@ const BrochureForm: FC<BrochureFormProps> = ({ isLoading, submitBrochure }) => {
             placeholder={t.companyNamePlaceholder} 
             isRequired 
             classNames={inputClassNames}
+            value={companyName}
+            onValueChange={onCompanyNameChange}
           />
         </div>
         <div className="w-full">
@@ -123,6 +112,8 @@ const BrochureForm: FC<BrochureFormProps> = ({ isLoading, submitBrochure }) => {
             type="url" 
             isRequired 
             classNames={inputClassNames}
+            value={url}
+            onValueChange={onUrlChange}
           />
         </div>
         <div className="flex gap-4 w-full lg:flex-row flex-col">
@@ -133,11 +124,12 @@ const BrochureForm: FC<BrochureFormProps> = ({ isLoading, submitBrochure }) => {
             <Select
               aria-label={t.ariaSelectType}
               isDisabled={isLoading}
-              selectedKeys={brochureType}
+              selectedKeys={new Set([brochureType])}
               startContent={brochureTypeIcon}
               onSelectionChange={(keys) => {
                 if (keys instanceof Set) {
-                  setBrochureType(new Set([...keys] as BrochureType[]))
+                  const next = Array.from(keys)[0] as BrochureType
+                  if (next) onBrochureTypeChange(next)
                 }
               }}
               className="w-full"
@@ -166,11 +158,12 @@ const BrochureForm: FC<BrochureFormProps> = ({ isLoading, submitBrochure }) => {
               isDisabled={isLoading}
               className="w-full"
               disallowEmptySelection={true}
-              selectedKeys={brochureLanguage}
+              selectedKeys={new Set([language])}
               startContent={languageIcon}
               onSelectionChange={(keys) => {
                 if (keys instanceof Set) {
-                  setBrochureLanguage(new Set([...keys] as LanguageStore[]))
+                  const next = Array.from(keys)[0] as LanguageStore
+                  if (next) onLanguageChange(next)
                 }
               }}
               isRequired
