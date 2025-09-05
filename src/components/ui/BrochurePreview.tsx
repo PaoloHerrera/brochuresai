@@ -35,31 +35,35 @@ export const BrochurePreview: FC<{ isLoading?: boolean; onRegenerate?: () => voi
   return (
     <div className="w-full rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900" aria-busy={isLoading}>
       <div className="flex items-center justify-between gap-3 px-3 py-2 bg-white/80 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-700 backdrop-blur">
-        {/* Reemplazamos el título por el botón de "volver a generar" */}
+        {/* Botón de "volver a generar" responsivo: icon-only en mobile */}
         <div className="flex items-center gap-2">
           <Button
             size="sm"
             radius="full"
             variant="flat"
             isDisabled={isLoading}
-            className="border border-slate-200 dark:border-slate-700 bg-cyan-600 hover:bg-cyan-700 text-white"
-            startContent={<RotateCcw size={16} />}
+            aria-label={t.regenerateLabel}
+            title={t.regenerateLabel}
+            className="border border-slate-200 dark:border-slate-700 bg-cyan-600 hover:bg-cyan-700 text-white px-2 sm:px-4"
+            startContent={<RotateCcw size={16} aria-hidden="true" focusable="false" />}
             onPress={() => onRegenerate?.()}
             isLoading={isLoading}
           >
-            {t.regenerateLabel}
+            <span className="hidden sm:inline">{t.regenerateLabel}</span>
           </Button>
         </div>
         <Button
           size="sm"
           radius="full"
           isDisabled={isDownloadDisabled}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:from-blue-700 hover:to-indigo-700"
-          startContent={<FileDown size={16} />}
+          className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-4"
+          startContent={<FileDown size={16} aria-hidden="true" focusable="false" />}
           onPress={handleDownloadPdf}
           isLoading={isDownloading}
+          aria-label={t.downloadLabel}
+          title={t.downloadLabel}
         >
-          {t.downloadLabel}
+          <span className="hidden sm:inline">{t.downloadLabel}</span>
         </Button>
       </div>
 
