@@ -1,13 +1,13 @@
 import type { FC } from 'react'
 import { Button, Skeleton } from '@heroui/react'
-import { FileDown } from 'lucide-react'
+import { FileDown, RotateCcw } from 'lucide-react'
 import { showErrorToast } from '../../utils/toasts'
 import { useBrochureStore } from '../../stores/useBrochureStore'
 import { useBrochureDownload } from '../../hooks/useBrochureDownload'
 import { useTranslate } from '../../hooks/useTranslate'
 import { PREVIEW_TEXT } from '../../lang/preview'
 
-export const BrochurePreview: FC<{ isLoading?: boolean }> = ({ isLoading = false }) => {
+export const BrochurePreview: FC<{ isLoading?: boolean; onRegenerate?: () => void | Promise<void> }> = ({ isLoading = false, onRegenerate }) => {
   const { brochure, cacheKey } = useBrochureStore()
   const { isDownloading, downloadPdf } = useBrochureDownload()
   const { t } = useTranslate(PREVIEW_TEXT)
@@ -21,7 +21,6 @@ export const BrochurePreview: FC<{ isLoading?: boolean }> = ({ isLoading = false
       return
     }
 
-    // Crear un enlace para descargar el archivo
     const link = document.createElement('a')
     const objectUrl = URL.createObjectURL(new Blob([result.blob], { type: 'application/pdf' }))
     link.href = objectUrl
@@ -36,7 +35,21 @@ export const BrochurePreview: FC<{ isLoading?: boolean }> = ({ isLoading = false
   return (
     <div className="w-full rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900" aria-busy={isLoading}>
       <div className="flex items-center justify-between gap-3 px-3 py-2 bg-white/80 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-700 backdrop-blur">
-        <div className="text-sm font-medium text-slate-700 dark:text-slate-300">{t.title}</div>
+        {/* Reemplazamos el título por el botón de "volver a generar" */}
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            radius="full"
+            variant="flat"
+            isDisabled={isLoading}
+            className="border border-slate-200 dark:border-slate-700 bg-cyan-600 hover:bg-cyan-700 text-white"
+            startContent={<RotateCcw size={16} />}
+            onPress={() => onRegenerate?.()}
+            isLoading={isLoading}
+          >
+            {t.regenerateLabel}
+          </Button>
+        </div>
         <Button
           size="sm"
           radius="full"
