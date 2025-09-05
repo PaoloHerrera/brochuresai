@@ -23,7 +23,7 @@ export const useBrochureSubmit = () => {
   const controllerRef = useRef<AbortController | null>(null)
 
   // Stores
-  const { setBrochure, setCompanyName, setCacheKey } = useBrochureStore()
+  const { setBrochure, setCacheKey, setLastSubmission } = useBrochureStore()
   const { setBrochuresRemaining } = useBrochuresRemainingStore()
   const { anonUserId } = useAnonUserIdStore()
 
@@ -59,9 +59,16 @@ export const useBrochureSubmit = () => {
       )
 
       setBrochure(response.data.brochure)
-      setCompanyName(data.companyName)
       setCacheKey(response.data.cache_key)
       setBrochuresRemaining(response.data.brochures_remaining)
+
+      // Persistimos la "última sumisión válida" sólo tras éxito
+      setLastSubmission({
+        companyName: data.companyName,
+        url: data.url,
+        language: data.language,
+        brochureType: data.brochureType,
+      })
 
       return { success: true }
     } catch (error) {
