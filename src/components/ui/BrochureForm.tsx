@@ -73,7 +73,7 @@ const BrochureForm = ({
     <Card className="max-w-3xl mx-auto p-6 shadow-lg bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
       <Form onSubmit={handleSubmit} className="flex flex-col gap-6 lg:gap-10">
         <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2 text-2xl font-semibold">
+          <div className="flex items-center gap-2 sm:text-2xl font-semibold text-lg">
             <Globe className="text-blue-500" />
             <span className="text-slate-900 dark:text-slate-100">{t.title}</span>
           </div>
