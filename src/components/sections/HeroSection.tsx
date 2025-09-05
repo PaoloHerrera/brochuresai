@@ -2,19 +2,31 @@ import { useTranslate } from '../../hooks/useTranslate'
 import { HEROTEXT } from '../../lang/hero'
 import { Chip, Tabs, Tab } from '@heroui/react'
 import { Sparkles, Zap, CheckCircle2, BookOpen, Eye } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import BrochureForm from '../ui/BrochureForm'
 import { useBrochureStore } from '../../stores/useBrochureStore'
 
 import { BrochurePreview } from '../ui/BrochurePreview'
 import { useBrochureSubmit } from '../../hooks/useBrochureSubmit'
+import { showErrorToast, showSuccessToast } from '../../utils/toasts'
+import { PREVIEW_TEXT } from '../../lang/preview'
+import { FORM_TEXT } from '../../lang/form'
+import type { LanguageStore } from '../../stores/useLanguageStore'
 
 export const HeroSection = () => {
   const { t } = useTranslate(HEROTEXT)
+  const { t: tPreview } = useTranslate(PREVIEW_TEXT)
+  const { t: tForm } = useTranslate(FORM_TEXT)
 
-  const { brochure } = useBrochureStore()
+  const { brochure, companyName, url, language, brochureType } = useBrochureStore()
   const { isLoading, submitBrochure } = useBrochureSubmit()
+
+  // Estado del formulario controlado por el padre (inicializado desde el store)
+  const [formCompanyName, setFormCompanyName] = useState<string>(companyName ?? '')
+  const [formUrl, setFormUrl] = useState<string>(url ?? '')
+  const [formLanguage, setFormLanguage] = useState<LanguageStore>(language)
+  const [formType, setFormType] = useState<'professional' | 'funny'>(brochureType)
 
   const chipIcons = [
     <CheckCircle2 key="c1" size={14} />, 
@@ -25,21 +37,56 @@ export const HeroSection = () => {
   // Estado controlado para Tabs. Por defecto, formulario.
   const [selectedTab, setSelectedTab] = useState<'brochure-form' | 'brochure-preview'>('brochure-form')
 
-  // Cuando llegue contenido al brochure por primera vez (o cambie), cambia a preview automáticamente.
-  useEffect(() => {
-    if (brochure.length > 0) {
-      setSelectedTab('brochure-preview')
-    } else {
-      setSelectedTab('brochure-form')
-    }
-  }, [brochure])
+  const performSubmit = async (payload: { companyName: string; url: string; language: LanguageStore; brochureType: 'professional' | 'funny' }) => {
 
-  // Si comienza la carga, mostramos el skeleton en la pestaña de preview inmediatamente
-  useEffect(() => {
-    if (isLoading) {
-      setSelectedTab('brochure-preview')
+    const result = await submitBrochure(payload)
+    if (!result.success) {
+      if (result.status === 429) {
+        showErrorToast(tForm.limitBrochuresTitle, tForm.limitBrochuresDescription)
+      } else {
+        showErrorToast(tForm.errorTitle, tForm.errorDescription)
+      }
+      return false
     }
-  }, [isLoading])
+
+    showSuccessToast(tForm.successTitle, tForm.successDescription)
+    return true
+  }
+
+  const handleSubmit = async () => {
+
+    //Si está cargando, no hacer nada
+    if (isLoading) return
+
+    setSelectedTab('brochure-preview')
+    const ok = await performSubmit({
+      companyName: formCompanyName,
+      url: formUrl,
+      language: formLanguage,
+      brochureType: formType,
+    })
+    if (!ok) setSelectedTab('brochure-form')
+  }
+
+  const handleRegenerate = async () => {
+
+    //Si está cargando, no hacer nada
+    if (isLoading) return
+
+    if (!companyName || !url) {
+      showErrorToast(tPreview.errorTitleRegenerate, tPreview.errorDescriptionRegenerate)
+      return
+    }
+
+    setFormCompanyName(companyName)
+    setFormUrl(url)
+    setFormLanguage(language)
+    setFormType(brochureType)
+
+    setSelectedTab('brochure-preview')
+    const ok = await performSubmit({ companyName, url, language, brochureType })
+    if (!ok) setSelectedTab('brochure-form')
+  }
 
   return (
     <section className="relative overflow-hidden min-h-[calc(100svh-4rem)] py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
@@ -91,7 +138,18 @@ export const HeroSection = () => {
                 </span>
               </div>
             }>
-              <BrochureForm isLoading={isLoading} submitBrochure={submitBrochure} />
+              <BrochureForm
+                isLoading={isLoading}
+                companyName={formCompanyName}
+                url={formUrl}
+                language={formLanguage}
+                brochureType={formType}
+                onCompanyNameChange={setFormCompanyName}
+                onUrlChange={setFormUrl}
+                onLanguageChange={setFormLanguage}
+                onBrochureTypeChange={setFormType}
+                onSubmit={handleSubmit}
+              />
             </Tab>
             <Tab key="brochure-preview" title={
               <div className="flex items-center gap-2">
@@ -104,7 +162,7 @@ export const HeroSection = () => {
             isDisabled={brochure.length === 0 && !isLoading}
             >
               <div className="w-full overflow-x-hidden">
-                <BrochurePreview isLoading={isLoading} />
+                <BrochurePreview isLoading={isLoading} onRegenerate={handleRegenerate} />
               </div>
             </Tab>
           </Tabs>
