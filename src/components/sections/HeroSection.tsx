@@ -38,7 +38,6 @@ export const HeroSection = () => {
   const [selectedTab, setSelectedTab] = useState<'brochure-form' | 'brochure-preview'>('brochure-form')
 
   const performSubmit = async (payload: { companyName: string; url: string; language: LanguageStore; brochureType: 'professional' | 'funny' }) => {
-
     const result = await submitBrochure(payload)
     if (!result.success) {
       if (result.status === 429) {
@@ -54,8 +53,7 @@ export const HeroSection = () => {
   }
 
   const handleSubmit = async () => {
-
-    //Si está cargando, no hacer nada
+    // Si está cargando, no hacer nada
     if (isLoading) return
 
     setSelectedTab('brochure-preview')
@@ -69,8 +67,7 @@ export const HeroSection = () => {
   }
 
   const handleRegenerate = async () => {
-
-    //Si está cargando, no hacer nada
+    // Si está cargando, no hacer nada
     if (isLoading) return
 
     if (!companyName || !url) {
@@ -99,16 +96,21 @@ export const HeroSection = () => {
             </span>
           </h1>
           <p className="text-slate-600 dark:text-slate-300 text-lg max-w-xl">{t.description}</p>
-          <div className="flex flex-wrap gap-3 text-sm flex-col sm:flex-row items-center sm:items-start">
+          <div className="flex flex-wrap gap-2.5 text-sm flex-col sm:flex-row items-center sm:items-start">
             {t.chips.map((chip, idx) => (
               <Chip
                 key={chip}
+                radius="sm"
+                size="sm"
                 variant="flat"
-                color="primary"
-                className="rounded-full px-2 bg-gradient-to-r from-cyan-500/15 to-blue-500/15 border border-cyan-400/30 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-200 shadow-sm hover:from-cyan-500/25 hover:to-blue-500/25 hover:shadow-md transition-all duration-200"
                 startContent={chipIcons[idx % chipIcons.length]}
+                aria-label={chip}
+                classNames={{
+                  base: "chip-base chip-accent",
+                  content: "chip-content",
+                }}
               >
-                <span className="font-medium text-xs sm:text-sm">{chip}</span>
+                {chip}
               </Chip>
             ))}
           </div>
@@ -117,27 +119,30 @@ export const HeroSection = () => {
         {/* Columna derecha: Formulario dentro de un contenedor con badge */}
         <div className="relative w-full lg:ml-auto overflow-hidden">
           <Tabs
-          className='w-full'
-          aria-label={t.tabsAria} classNames={
-            {
+            className="w-full"
+            aria-label={t.tabsAria}
+            classNames={{
               tabList: "w-full relative rounded-none p-0 mx-1 border-b border-divider gap-0",
               cursor: "w-full bg-[#22d3ee]",
               tabContent: "group-data-[selected=true]:text-[#06b6d4]",
             }}
-              color="primary"
-              variant="underlined"
-              selectedKey={selectedTab}
-              onSelectionChange={(key) => setSelectedTab(String(key) as 'brochure-form' | 'brochure-preview')}
-              destroyInactiveTabPanel={false}
+            color="primary"
+            variant="underlined"
+            selectedKey={selectedTab}
+            onSelectionChange={(key) => setSelectedTab(String(key) as 'brochure-form' | 'brochure-preview')}
+            destroyInactiveTabPanel={false}
+          >
+            <Tab
+              key="brochure-form"
+              title={
+                <div className="flex items-center gap-2">
+                  <BookOpen size={16} />
+                  <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {t.brochureFormTab}
+                  </span>
+                </div>
+              }
             >
-            <Tab key="brochure-form" title={
-              <div className="flex items-center gap-2">
-                <BookOpen size={16} />
-                <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">
-                  {t.brochureFormTab}
-                </span>
-              </div>
-            }>
               <BrochureForm
                 isLoading={isLoading}
                 companyName={formCompanyName}
@@ -151,15 +156,17 @@ export const HeroSection = () => {
                 onSubmit={handleSubmit}
               />
             </Tab>
-            <Tab key="brochure-preview" title={
-              <div className="flex items-center gap-2">
-                <Eye size={16} />
-                <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">
-                  {t.brochurePreviewTab}
-                </span>
-              </div>
-            }
-            isDisabled={brochure.length === 0 && !isLoading}
+            <Tab
+              key="brochure-preview"
+              title={
+                <div className="flex items-center gap-2">
+                  <Eye size={16} />
+                  <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {t.brochurePreviewTab}
+                  </span>
+                </div>
+              }
+              isDisabled={brochure.length === 0 && !isLoading}
             >
               <div className="w-full overflow-x-hidden">
                 <BrochurePreview isLoading={isLoading} onRegenerate={handleRegenerate} />

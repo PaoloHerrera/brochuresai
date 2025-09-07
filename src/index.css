@@ -15,3 +15,21 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Base unificada para todos los Chips - definidas como utilidades Tailwind v4 */
+@utility chip-base {
+  /* Solo estructura y espaciado; sin colores ni borde para permitir variantes */
+  @apply !inline-flex !items-center !px-2 !py-1.5 sm:px-3 !gap-1.5;
+}
+@utility chip-accent {
+  /* Paleta por defecto usada en secciones (forzamos prioridad para sobrepasar estilos de variantes) */
+  @apply !bg-cyan-50 !text-cyan-700 !border-cyan-200 dark:!bg-cyan-900/30 dark:!text-cyan-200 dark:!border-cyan-700/40 !border-2;
+}
+@utility chip-content {
+  @apply !text-xs sm:!text-sm !font-semibold;
+}
+
+/* CTA principal (HowItWorks, etc.) como utilidad */
+@utility btn-cta {
+  @apply !rounded-full !bg-gradient-to-r !from-blue-600 !to-indigo-600 !text-white !font-semibold !shadow-lg !shadow-blue-600/20 hover:!from-blue-700 hover:!to-indigo-700;
+}

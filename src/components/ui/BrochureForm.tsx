@@ -9,6 +9,7 @@ import {
   Select,
   SelectItem,
   Tooltip,
+  Chip,
 } from '@heroui/react'
 
 import type { LanguageStore } from '../../stores/useLanguageStore'
@@ -73,18 +74,24 @@ const BrochureForm = ({
     <Card className="max-w-3xl mx-auto p-6 shadow-lg bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
       <Form onSubmit={handleSubmit} className="flex flex-col gap-6 lg:gap-10">
         <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2 sm:text-2xl font-semibold text-lg">
+          <div className="flex items-center gap-2 sm:text-2xl font-semibold">
             <Globe className="text-blue-500" />
             <span className="text-slate-900 dark:text-slate-100">{t.title}</span>
           </div>
-          <div
-            className={`ml-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${badgeClasses}`}
-            title={t.remainingTooltip}
+          <Chip
+            radius="sm"
+            size="sm"
+            variant="bordered"
+            startContent={<Gauge size={14} className="opacity-80" />}
             aria-live="polite"
+            title={t.remainingTooltip}
+            classNames={{
+              base: `ml-3 chip-base ${badgeClasses}`,
+              content: "chip-content",
+            }}
           >
-            <Gauge size={14} className="opacity-80" />
             <span className="tabular-nums">{remaining}</span>
-          </div>
+          </Chip>
         </div>
         <p className="text-gray-500 dark:text-slate-400 -mt-3 mb-2 text-sm">{t.description}</p>
         <div className='w-full'>
@@ -187,7 +194,8 @@ const BrochureForm = ({
               isLoading={isLoading}
               isDisabled={remaining <= 0}
               type="submit"
-              className="group relative mt-3 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-4 text-white text-lg font-semibold shadow-lg shadow-blue-600/20 transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+              radius="full"
+              className="group relative mt-3 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-4 text-white text-lg font-semibold shadow-lg shadow-blue-600/20 transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <Wand2 size={24} className="transition-transform duration-200 ease-out group-hover:-rotate-12 group-hover:translate-x-0.5" /> 
               {t.submitButton}

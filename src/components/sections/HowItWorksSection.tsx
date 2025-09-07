@@ -1,6 +1,7 @@
 import { ArrowRight, Eye, FileDown, Globe, Wand2 } from 'lucide-react'
 import { useTranslate } from '../../hooks/useTranslate'
 import { HOWITWORKS_TEXT } from '../../lang/howitworks'
+import { Button, Chip, Link } from '@heroui/react'
 
 export const HowItWorksSection = () => {
   const { t } = useTranslate(HOWITWORKS_TEXT)
@@ -14,9 +15,17 @@ export const HowItWorksSection = () => {
       {/* Contenido envuelto por Container en App.tsx */}
       <div>
         <div className="text-center mb-12">
-          <span className="inline-flex items-center rounded-full border border-cyan-200/60 dark:border-cyan-800/60 bg-cyan-50 dark:bg-cyan-900/30 px-3 py-1 text-xs font-semibold text-cyan-700 dark:text-cyan-300">
+          <Chip
+            radius="sm"
+            size="sm"
+            variant="bordered"
+            classNames={{
+              base: "chip-base chip-accent",
+              content: "chip-content",
+            }}
+          >
             {t.eyebrow}
-          </span>
+          </Chip>
           <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
             {t.title}
           </h2>
@@ -78,13 +87,14 @@ export const HowItWorksSection = () => {
 
         {/* CTA */}
         <div className="mt-12 flex justify-center">
-          <a
+          <Button
+            as={Link}
             href="#"
-            className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-white font-semibold shadow-lg shadow-blue-600/20 hover:from-blue-700 hover:to-indigo-700"
+            className="btn-cta"
           >
             {t.cta}
-            <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
-          </a>
+            <ArrowRight size={18} className="ml-2 transition-transform group-hover:translate-x-0.5" />
+          </Button>
         </div>
       </div>
     </section>

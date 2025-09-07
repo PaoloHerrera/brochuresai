@@ -101,10 +101,11 @@ export const NavbarUI = () => {
         <NavbarItem>
           <Button
             variant="flat"
+            radius="full"
             color="secondary"
             as={Link}
             href={GITHUB_URL}
-            className="rounded-full bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:bg-white dark:hover:bg-slate-800"
+            className="bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:bg-white dark:hover:bg-slate-800"
           >
             <GithubIcon ariaLabel={t.github} title={t.github} />
             {t.github}
@@ -153,6 +154,7 @@ export const NavbarUI = () => {
         <NavbarMenuItem className="pt-2">
           <Button
             variant="flat"
+            radius="full"
             color="secondary"
             as={Link}
             href={GITHUB_URL}

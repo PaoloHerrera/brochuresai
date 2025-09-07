@@ -1,4 +1,4 @@
-import { Button, Link } from '@heroui/react'
+import { Button, Link, Chip } from '@heroui/react'
 import { GithubIcon } from '../icons/GithubIcon'
 import { useTranslate } from '../../hooks/useTranslate'
 import { OPENSOURCE_TEXT } from '../../lang/opensource'
@@ -16,19 +16,28 @@ export const OpenSourceSection = () => {
           <p className="mt-4 text-slate-300 max-w-2xl mx-auto">{t.description}</p>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-8">
           {t.badges.map((b: string, idx: number) => (
-            <span key={idx} className="rounded-full border border-cyan-400/30 bg-white/5 px-4 py-1 text-sm text-slate-200">
+            <Chip
+              key={idx}
+              radius="sm"
+              size="sm"
+              variant="bordered"
+              classNames={{
+                base: "chip-base chip-accent",
+                content: "chip-content",
+              }}
+            >
               {b}
-            </span>
+            </Chip>
           ))}
         </div>
 
         <div className="flex items-center justify-center gap-4">
-          <Button as={Link} href={GITHUB_URL} color="secondary" variant="flat" className="rounded-full text-slate-200">
+          <Button as={Link} href={GITHUB_URL} color="secondary" radius="full" variant="flat" className="text-slate-200">
             <GithubIcon ariaLabel={t.ctaPrimary} title={t.ctaPrimary} /> {t.ctaPrimary}
           </Button>
-          <Button as={Link} href={GITHUB_URL} variant="bordered" className="rounded-full border-cyan-400/40 text-slate-200">
+          <Button as={Link} href={GITHUB_URL} radius="full" variant="bordered" className="border-cyan-400/40 text-slate-200">
             {t.ctaSecondary}
           </Button>
         </div>
