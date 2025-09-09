@@ -131,6 +131,8 @@ export const HeroSection = () => {
             selectedKey={selectedTab}
             onSelectionChange={(key) => setSelectedTab(String(key) as 'brochure-form' | 'brochure-preview')}
             destroyInactiveTabPanel={false}
+            data-testid="hero-tabs"
+            data-selected={selectedTab}
           >
             <Tab
               key="brochure-form"
