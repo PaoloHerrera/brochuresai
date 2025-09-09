@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
+import axios, { isAxiosError } from 'axios'
 import { API_BASE_URL } from '../config'
 
 import { useBrochureStore } from '../stores/useBrochureStore'
@@ -72,7 +72,7 @@ export const useBrochureSubmit = () => {
 
       return { success: true }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         return { success: false, status: error.response?.status, error }
       }
       return { success: false, error }
