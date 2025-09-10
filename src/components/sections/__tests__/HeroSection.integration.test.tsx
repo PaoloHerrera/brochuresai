@@ -12,6 +12,7 @@ import { useLanguageStore } from '../../../stores/useLanguageStore'
 import type { AxiosResponse } from '../../../test/test-helpers'
 import { makeAxiosResponse, getSubmitButton, selectButtonByName } from '../../../test/test-helpers'
 import type React from 'react'
+import { PREVIEW_TEXT } from '../../../lang/preview'
 
 vi.mock('axios', () => {
   const post = vi.fn()
@@ -97,7 +98,11 @@ const resetStores = () => {
   useAnonUserIdStore.setState({ anonUserId: 'anon-123', setAnonUserId: useAnonUserIdStore.getState().setAnonUserId })
 }
 
-const fillForm = async (container: HTMLElement, { name, url }: { name: string; url: string }) => {
+// Helpers EN para reducir duplicación
+const fillFormEN = async (
+  container: HTMLElement,
+  { name = 'Acme Inc', url = 'https://acme.com' }: { name?: string; url?: string } = {}
+) => {
   const nameInput = screen.getByPlaceholderText(/my company/i)
   const urlInput = screen.getByPlaceholderText(/https:\/\/example\.com/i)
   await userEvent.clear(nameInput)
@@ -106,6 +111,11 @@ const fillForm = async (container: HTMLElement, { name, url }: { name: string; u
   await userEvent.type(urlInput, url)
   const submitBtn = getSubmitButton(container)
   return { submitBtn }
+}
+
+const clickRegenerateEN = async () => {
+  const regenerateBtn = selectButtonByName(new RegExp(PREVIEW_TEXT.en.regenerateLabel, 'i'))
+  await userEvent.click(regenerateBtn)
 }
 
 const getSelectedTabKey = () => {
@@ -133,7 +143,7 @@ describe('HeroSection - integración (tabs y regenerate)', () => {
       })
     )
 
-    const { submitBtn } = await fillForm(container, { name: 'Acme Inc', url: 'https://acme.com' })
+    const { submitBtn } = await fillFormEN(container)
 
     await userEvent.click(submitBtn)
 
@@ -152,7 +162,7 @@ describe('HeroSection - integración (tabs y regenerate)', () => {
     })
     asAxios().post.mockImplementationOnce(() => pending as unknown as Promise<AxiosResponse<ApiGenerateResponse>>)
 
-    const { submitBtn } = await fillForm(container, { name: 'Acme Inc', url: 'https://acme.com' })
+    const { submitBtn } = await fillFormEN(container)
 
     await userEvent.click(submitBtn)
 
@@ -179,7 +189,7 @@ describe('HeroSection - integración (tabs y regenerate)', () => {
       })
     )
 
-    const { submitBtn } = await fillForm(container, { name: 'Acme Inc', url: 'https://acme.com' })
+    const { submitBtn } = await fillFormEN(container)
     await userEvent.click(submitBtn)
     await waitFor(() => expect(getSelectedTabKey()).toBe('brochure-preview'))
 
@@ -200,8 +210,7 @@ describe('HeroSection - integración (tabs y regenerate)', () => {
       })
     )
 
-    const regenerateBtn = selectButtonByName(/regenerate brochure/i)
-    await userEvent.click(regenerateBtn)
+    await clickRegenerateEN()
 
     await waitFor(() => {
       // Debe permanecer/ir a preview
