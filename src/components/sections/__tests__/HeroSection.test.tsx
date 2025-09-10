@@ -266,6 +266,111 @@ describe('HeroSection - toasts', () => {
     toastSpy.mockRestore()
   })
 
+  it('submit con campos faltantes NO dispara toast y NO llama API (EN) porque el botón está deshabilitado', async () => {
+    const errorToastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const successToastSpy = vi.spyOn(toasts, 'showSuccessToast').mockImplementation(() => {})
+
+    const { container } = renderWithProviders(<HeroSection />)
+
+    const submitBtn = getSubmitButton(container)
+    await userEvent.click(submitBtn)
+
+    // No debería ejecutar flujo de submit
+    await waitFor(() => {
+      expect(asAxios().post).not.toHaveBeenCalled()
+      expect(errorToastSpy).not.toHaveBeenCalled()
+      expect(successToastSpy).not.toHaveBeenCalled()
+    })
+
+    errorToastSpy.mockRestore()
+    successToastSpy.mockRestore()
+  })
+
+  it('submit con campos faltantes NO dispara toast y NO llama API (ES) porque el botón está deshabilitado', async () => {
+    const errorToastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const successToastSpy = vi.spyOn(toasts, 'showSuccessToast').mockImplementation(() => {})
+
+    useLanguageStore.setState({ language: 'es', setLanguage: useLanguageStore.getState().setLanguage })
+
+    const { container } = renderWithProviders(<HeroSection />)
+
+    const submitBtn = getSubmitButton(container)
+    await userEvent.click(submitBtn)
+
+    await waitFor(() => {
+      expect(asAxios().post).not.toHaveBeenCalled()
+      expect(errorToastSpy).not.toHaveBeenCalled()
+      expect(successToastSpy).not.toHaveBeenCalled()
+    })
+
+    errorToastSpy.mockRestore()
+    successToastSpy.mockRestore()
+  })
+
+  it('submit exitoso muestra toast de éxito (EN)', async () => {
+    const toastSpy = vi.spyOn(toasts, 'showSuccessToast').mockImplementation(() => {})
+
+    const { container } = renderWithProviders(<HeroSection />)
+
+    const nameInput = screen.getByPlaceholderText(/my company/i)
+    const urlInput = screen.getByPlaceholderText(/https:\/\/example\.com/i)
+    await userEvent.clear(nameInput)
+    await userEvent.type(nameInput, 'Acme Inc')
+    await userEvent.clear(urlInput)
+    await userEvent.type(urlInput, 'https://acme.com')
+
+    asAxios().post.mockResolvedValueOnce(
+      makeAxiosResponse({ brochure: '<html>ok</html>', cache_key: 'cache-ok-1', brochures_remaining: 4 })
+    )
+
+    const submitBtn = getSubmitButton(container)
+    await userEvent.click(submitBtn)
+
+    await waitFor(() => {
+      expect(toastSpy).toHaveBeenCalledWith(FORM_TEXT.en.successTitle, FORM_TEXT.en.successDescription)
+      expect(asAxios().post).toHaveBeenCalledTimes(1)
+    })
+
+    toastSpy.mockRestore()
+  })
+
+  it('regenerate exitoso muestra toast de éxito (EN)', async () => {
+    const toastSpy = vi.spyOn(toasts, 'showSuccessToast').mockImplementation(() => {})
+
+    // Prepara el store con datos válidos para regenerate
+    useBrochureStore.setState({
+      companyName: 'Acme Inc',
+      url: 'https://acme.com',
+      language: 'en',
+      brochure: '<html><body>preview</body></html>',
+      brochureType: 'professional',
+      cacheKey: 'cache-prev',
+      setBrochure: useBrochureStore.getState().setBrochure,
+      setUrl: useBrochureStore.getState().setUrl,
+      setLanguage: useBrochureStore.getState().setLanguage,
+      setBrochureType: useBrochureStore.getState().setBrochureType,
+      setCompanyName: useBrochureStore.getState().setCompanyName,
+      setCacheKey: useBrochureStore.getState().setCacheKey,
+      setLastSubmission: useBrochureStore.getState().setLastSubmission,
+    })
+
+    renderWithProviders(<HeroSection />)
+
+    asAxios().post.mockResolvedValueOnce(
+      makeAxiosResponse({ brochure: '<html>ok</html>', cache_key: 'cache-ok-2', brochures_remaining: 3 })
+    )
+
+    const regenerateBtn = selectButtonByName(/regenerate brochure/i)
+    await userEvent.click(regenerateBtn)
+
+    await waitFor(() => {
+      expect(toastSpy).toHaveBeenCalledWith(FORM_TEXT.en.successTitle, FORM_TEXT.en.successDescription)
+      expect(asAxios().post).toHaveBeenCalledTimes(1)
+    })
+
+    toastSpy.mockRestore()
+  })
+
   it('submit falla con 500 muestra toast de error traducido (ES)', async () => {
     const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
 
