@@ -192,7 +192,7 @@ const BrochureForm = ({
           <div className="inline-flex">
             <Button
               isLoading={isLoading}
-              isDisabled={remaining <= 0}
+              isDisabled={remaining <= 0 || isLoading}
               type="submit"
               radius="full"
               className="group relative mt-3 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-4 text-white text-lg font-semibold shadow-lg shadow-blue-600/20 transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
