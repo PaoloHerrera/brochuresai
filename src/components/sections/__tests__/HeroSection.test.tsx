@@ -13,6 +13,9 @@ import type { AxiosResponse } from '../../../test/test-helpers'
 import { makeAxiosResponse, getSubmitButton } from '../../../test/test-helpers'
 import { selectButtonByName } from '../../../test/test-helpers'
 import type React from 'react'
+import * as toasts from '../../../utils/toasts'
+import { FORM_TEXT } from '../../../lang/form'
+import { PREVIEW_TEXT } from '../../../lang/preview'
 
 vi.mock('axios', () => {
   const post = vi.fn()
@@ -211,5 +214,83 @@ describe('HeroSection - guards de isLoading', () => {
       expect(useBrochureStore.getState().cacheKey).toBe('cache-regen-1')
       expect(useBrochureStore.getState().brochure).toContain('<html>')
     })
+  })
+})
+
+describe('HeroSection - toasts', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    resetStores()
+    // Asegurar idioma EN para casos que validan textos EN; cada test ajusta idioma si requiere ES
+    useLanguageStore.setState({ language: 'en', setLanguage: useLanguageStore.getState().setLanguage })
+  })
+
+  it('handleRegenerate sin valores previos muestra toast de error de regeneración (EN)', async () => {
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+
+    renderWithProviders(<HeroSection />)
+
+    const regenerateBtn = selectButtonByName(/regenerate brochure/i)
+    await userEvent.click(regenerateBtn)
+
+    await waitFor(() => {
+      expect(toastSpy).toHaveBeenCalledWith(PREVIEW_TEXT.en.errorTitleRegenerate, PREVIEW_TEXT.en.errorDescriptionRegenerate)
+      expect(asAxios().post).not.toHaveBeenCalled()
+    })
+
+    toastSpy.mockRestore()
+  })
+
+  it('submit falla con 429 muestra toast de límite (EN)', async () => {
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+
+    const { container } = renderWithProviders(<HeroSection />)
+
+    const nameInput = screen.getByPlaceholderText(/my company/i)
+    const urlInput = screen.getByPlaceholderText(/https:\/\/example\.com/i)
+    await userEvent.clear(nameInput)
+    await userEvent.type(nameInput, 'Acme Inc')
+    await userEvent.clear(urlInput)
+    await userEvent.type(urlInput, 'https://acme.com')
+
+    asAxios().post.mockRejectedValueOnce({ isAxiosError: true, response: { status: 429 } })
+
+    const submitBtn = getSubmitButton(container)
+    await userEvent.click(submitBtn)
+
+    await waitFor(() => {
+      expect(toastSpy).toHaveBeenCalledWith(FORM_TEXT.en.limitBrochuresTitle, FORM_TEXT.en.limitBrochuresDescription)
+      expect(asAxios().post).toHaveBeenCalledTimes(1)
+    })
+
+    toastSpy.mockRestore()
+  })
+
+  it('submit falla con 500 muestra toast de error traducido (ES)', async () => {
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+
+    // Cambiar idioma a ES antes de render para placeholders y textos
+    useLanguageStore.setState({ language: 'es', setLanguage: useLanguageStore.getState().setLanguage })
+
+    const { container } = renderWithProviders(<HeroSection />)
+
+    const nameInputEs = screen.getByPlaceholderText(/mi empresa/i)
+    const urlInputEs = screen.getByPlaceholderText(/https:\/\/ejemplo\.com/i)
+    await userEvent.clear(nameInputEs)
+    await userEvent.type(nameInputEs, 'Empresa SA')
+    await userEvent.clear(urlInputEs)
+    await userEvent.type(urlInputEs, 'https://empresa.com')
+
+    asAxios().post.mockRejectedValueOnce({ isAxiosError: true, response: { status: 500 } })
+
+    const submitBtn = getSubmitButton(container)
+    await userEvent.click(submitBtn)
+
+    await waitFor(() => {
+      expect(toastSpy).toHaveBeenCalledWith(FORM_TEXT.es.errorTitle, FORM_TEXT.es.errorDescription)
+      expect(asAxios().post).toHaveBeenCalledTimes(1)
+    })
+
+    toastSpy.mockRestore()
   })
 })
