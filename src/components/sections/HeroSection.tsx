@@ -14,6 +14,12 @@ import { PREVIEW_TEXT } from '../../lang/preview'
 import { FORM_TEXT } from '../../lang/form'
 import type { LanguageStore } from '../../stores/useLanguageStore'
 
+const CHIP_ICONS = [
+  <CheckCircle2 key="c1" size={14} />,
+  <Sparkles key="c2" size={14} />,
+  <Zap key="c3" size={14} />,
+]
+
 export const HeroSection = () => {
   const { t } = useTranslate(HEROTEXT)
   const { t: tPreview } = useTranslate(PREVIEW_TEXT)
@@ -27,12 +33,6 @@ export const HeroSection = () => {
   const [formUrl, setFormUrl] = useState<string>(url ?? '')
   const [formLanguage, setFormLanguage] = useState<LanguageStore>(language)
   const [formType, setFormType] = useState<'professional' | 'funny'>(brochureType)
-
-  const chipIcons = [
-    <CheckCircle2 key="c1" size={14} />, 
-    <Sparkles key="c2" size={14} />, 
-    <Zap key="c3" size={14} />,
-  ]
 
   // Estado controlado para Tabs. Por defecto, formulario.
   const [selectedTab, setSelectedTab] = useState<'brochure-form' | 'brochure-preview'>('brochure-form')
@@ -103,7 +103,7 @@ export const HeroSection = () => {
                 radius="sm"
                 size="sm"
                 variant="flat"
-                startContent={chipIcons[idx % chipIcons.length]}
+                startContent={CHIP_ICONS[idx % CHIP_ICONS.length]}
                 aria-label={chip}
                 classNames={{
                   base: "chip-base chip-accent",
