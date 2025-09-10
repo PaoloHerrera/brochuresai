@@ -6,6 +6,8 @@ import { useBrochureStore } from '../../../stores/useBrochureStore'
 import { describe, beforeEach, it, expect, vi } from 'vitest'
 import type { BrochureState } from '../../../stores/useBrochureStore'
 import { setLanguage, selectButtonByName, makePdfBlob, withBlobUrlSpies } from '../../../test/test-helpers'
+import * as toasts from '../../../utils/toasts'
+import { PREVIEW_TEXT } from '../../../lang/preview'
 
 // Mock the useBrochureDownload hook
 const mockDownloadPdf = vi.fn()
@@ -103,5 +105,55 @@ describe('BrochurePreview', () => {
         expect(mockDownloadPdf).toHaveBeenCalledWith('cache-123')
       })
     })
+  })
+
+  it('muestra toast de error si la descarga falla (EN)', async () => {
+    // Forzar fallo de descarga
+    mockDownloadPdf.mockResolvedValueOnce({ success: false })
+
+    // Espiar el toast y evitar ejecutar la implementación real
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const createUrlSpy = vi.spyOn(URL, 'createObjectURL')
+
+    renderWithProviders(<BrochurePreview />)
+
+    const downloadBtn = selectButtonByName(/download pdf/i)
+    await userEvent.click(downloadBtn)
+
+    await waitFor(() => {
+      expect(mockDownloadPdf).toHaveBeenCalledWith('cache-123')
+      expect(toastSpy).toHaveBeenCalledWith(PREVIEW_TEXT.en.errorTitle, PREVIEW_TEXT.en.errorDescription)
+      expect(createUrlSpy).not.toHaveBeenCalled()
+    })
+
+    toastSpy.mockRestore()
+    createUrlSpy.mockRestore()
+  })
+
+  it('muestra toast traducido a ES si la descarga falla', async () => {
+    // Forzar fallo de descarga
+    mockDownloadPdf.mockResolvedValueOnce({ success: false })
+
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const createUrlSpy = vi.spyOn(URL, 'createObjectURL')
+
+    renderWithProviders(<BrochurePreview />)
+
+    await act(async () => {
+      await setLanguage('es')
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
+
+    const downloadBtn = selectButtonByName(/descargar pdf/i)
+    await userEvent.click(downloadBtn)
+
+    await waitFor(() => {
+      expect(mockDownloadPdf).toHaveBeenCalledWith('cache-123')
+      expect(toastSpy).toHaveBeenCalledWith(PREVIEW_TEXT.es.errorTitle, PREVIEW_TEXT.es.errorDescription)
+      expect(createUrlSpy).not.toHaveBeenCalled()
+    })
+
+    toastSpy.mockRestore()
+    createUrlSpy.mockRestore()
   })
 })
