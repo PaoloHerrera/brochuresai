@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../config'
 
 import { useBrochureStore } from '../stores/useBrochureStore'
 import { useBrochuresRemainingStore } from '../stores/useBrochuresRemaining'
-import { useAnonUserIdStore } from '../stores/useAnonUserId'
+import { useAnonIdStore } from '../stores/useAnonId'
 import type {LanguageStore} from '../stores/useLanguageStore'
 
 export interface BrochureSubmitData {
@@ -25,7 +25,7 @@ export const useBrochureSubmit = () => {
   // Stores
   const { setBrochure, setCacheKey, setLastSubmission } = useBrochureStore()
   const { setBrochuresRemaining } = useBrochuresRemainingStore()
-  const { anonUserId } = useAnonUserIdStore()
+  const { anonId } = useAnonIdStore()
 
   useEffect(() => {
     return () => {
@@ -46,7 +46,7 @@ export const useBrochureSubmit = () => {
       const response = await axios.post(
         `${API_BASE_URL}/api/v1/create_brochure`,
         {
-          anon_id: anonUserId,
+          anon_id: anonId,
           company_name: data.companyName,
           url: data.url,
           language: data.language,
