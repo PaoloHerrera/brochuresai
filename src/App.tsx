@@ -1,17 +1,19 @@
 import './App.css'
+import { Suspense, lazy, useEffect } from 'react'
 import { HeroSection } from './components/sections/HeroSection'
-import { NavbarUI } from './components/ui/NavbarUI'
-import { HowItWorksSection } from './components/sections/HowItWorksSection'
-import { FeaturesSection } from './components/sections/FeaturesSection'
-import { OpenSourceSection } from './components/sections/OpenSourceSection'
-import { FAQSection } from './components/sections/FAQSection'
-import { Footer } from './components/ui/Footer'
 import { Container } from './components/ui/Container'
+import { NavbarUI } from './components/ui/NavbarUI'
 
-import { useEffect } from 'react'
 import { getBrochuresRemaining } from './services/getBrochuresRemaining'
 import { useAnonIdStore } from './stores/useAnonId'
 import { useBrochuresRemainingStore } from './stores/useBrochuresRemaining'
+
+// Lazy components
+const HowItWorksSectionLazy = lazy(() => import('./components/sections/HowItWorksSection').then(m => ({ default: m.HowItWorksSection })))
+const FeaturesSectionLazy = lazy(() => import('./components/sections/FeaturesSection').then(m => ({ default: m.FeaturesSection })))
+const OpenSourceSectionLazy = lazy(() => import('./components/sections/OpenSourceSection').then(m => ({ default: m.OpenSourceSection })))
+const FAQSectionLazy = lazy(() => import('./components/sections/FAQSection').then(m => ({ default: m.FAQSection })))
+const FooterLazy = lazy(() => import('./components/ui/Footer').then(m => ({ default: m.Footer })))
 
 function App() {
 
@@ -43,11 +45,21 @@ function App() {
         <Container>
           <NavbarUI />
           <HeroSection />
-          <HowItWorksSection />
-          <FeaturesSection />
-          <OpenSourceSection />
-          <FAQSection />
-          <Footer />
+          <Suspense fallback={null}>
+            <HowItWorksSectionLazy />
+          </Suspense>
+          <Suspense fallback={null}>
+            <FeaturesSectionLazy />
+          </Suspense>
+          <Suspense fallback={null}>
+            <OpenSourceSectionLazy />
+          </Suspense>
+          <Suspense fallback={null}>
+            <FAQSectionLazy />
+          </Suspense>
+          <Suspense fallback={null}>
+            <FooterLazy />
+          </Suspense>
         </Container>
       </div>
     </>
