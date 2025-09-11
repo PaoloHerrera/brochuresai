@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+@import './fonts.css';
 @import "tailwindcss";
 @plugin './hero.ts';
 /* Note: You may need to change the path to fit your project structure */

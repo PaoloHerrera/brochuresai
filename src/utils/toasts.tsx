@@ -1,7 +1,7 @@
-import { addToast } from '@heroui/react'
 import { CircleX, CheckCircle2 } from 'lucide-react'
 
-export const showErrorToast = (title: string, description?: string) => {
+export const showErrorToast = async (title: string, description?: string) => {
+  const { addToast } = await import('@heroui/react')
   addToast({
     title,
     description,
@@ -10,7 +10,8 @@ export const showErrorToast = (title: string, description?: string) => {
   })
 }
 
-export const showSuccessToast = (title: string, description?: string) => {
+export const showSuccessToast = async (title: string, description?: string) => {
+  const { addToast } = await import('@heroui/react')
   addToast({
     title,
     description,
