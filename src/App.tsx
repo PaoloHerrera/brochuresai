@@ -10,21 +10,21 @@ import { Container } from './components/ui/Container'
 
 import { useEffect } from 'react'
 import { getBrochuresRemaining } from './services/getBrochuresRemaining'
-import { useAnonUserIdStore } from './stores/useAnonUserId'
+import { useAnonIdStore } from './stores/useAnonId'
 import { useBrochuresRemainingStore } from './stores/useBrochuresRemaining'
 
 function App() {
 
-  const {anonUserId, setAnonUserId} = useAnonUserIdStore()
+  const {anonId, setAnonId} = useAnonIdStore()
   const {setBrochuresRemaining} = useBrochuresRemainingStore()
 
   useEffect(() => {
     let cancelled = false
-    getBrochuresRemaining(anonUserId).then((res) => {
+    getBrochuresRemaining(anonId).then((res) => {
       if (cancelled) return
       if (res && res.success) {
         setBrochuresRemaining(res.data.brochures_remaining)
-        setAnonUserId(res.data.anon_id)
+        setAnonId(res.data.anon_id)
       } else {
         // Fallback seguro si hay error: no sobreescribir si ya existe, o setear mínimos
         // Podríamos mostrar un toast en el futuro; por ahora, solo no crashear.
@@ -34,7 +34,7 @@ function App() {
       // Evitar crash si se rechaza la promesa
     })
     return () => { cancelled = true }
-  }, [anonUserId, setAnonUserId, setBrochuresRemaining])
+  }, [anonId, setAnonId, setBrochuresRemaining])
 
 
   return (
