@@ -2,12 +2,13 @@ import { useTranslate } from '../../hooks/useTranslate'
 import { HEROTEXT } from '../../lang/hero'
 import { Chip, Tabs, Tab } from '@heroui/react'
 import { Sparkles, Zap, CheckCircle2, BookOpen, Eye } from 'lucide-react'
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 
 import BrochureForm from '../ui/BrochureForm'
 import { useBrochureStore } from '../../stores/useBrochureStore'
 
-import { BrochurePreview } from '../ui/BrochurePreview'
+// import { BrochurePreview } from '../ui/BrochurePreview'
+const BrochurePreviewLazy = lazy(() => import('../ui/BrochurePreview').then(m => ({ default: m.BrochurePreview })))
 import { useBrochureSubmit } from '../../hooks/useBrochureSubmit'
 import { showErrorToast, showSuccessToast } from '../../utils/toasts'
 import { PREVIEW_TEXT } from '../../lang/preview'
@@ -171,7 +172,9 @@ export const HeroSection = () => {
               isDisabled={brochure.length === 0 && !isLoading}
             >
               <div className="w-full overflow-x-hidden">
-                <BrochurePreview isLoading={isLoading} onRegenerate={handleRegenerate} />
+                <Suspense fallback={<div className="h-64 sm:h-72 lg:h-80" /> }>
+                  <BrochurePreviewLazy isLoading={isLoading} onRegenerate={handleRegenerate} />
+                </Suspense>
               </div>
             </Tab>
           </Tabs>
