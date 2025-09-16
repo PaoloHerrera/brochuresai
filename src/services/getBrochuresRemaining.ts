@@ -1,21 +1,15 @@
-import axios from "axios";
-import { API_BASE_URL } from "../config";
-
-export interface GetBrochuresRemainingResponse {
-  brochures_remaining: number
-  anon_id: string
-}
-
-export type GetBrochuresRemainingResult =
-  | { success: true; data: GetBrochuresRemainingResponse }
-  | { success: false; error?: unknown }
+import { apiGet } from "./http";
+import type { GetBrochuresRemainingResponse, GetBrochuresRemainingResult } from "../types";
 
 export const getBrochuresRemaining = async (
-  anonId: string | null
+  anonId: string | null,
+  options?: { signal?: AbortSignal; timeoutMs?: number }
 ): Promise<GetBrochuresRemainingResult> => {
   try {
-    const res = await axios.get(`${API_BASE_URL}/api/v1/users/get_remaining`, {
+    const res = await apiGet<GetBrochuresRemainingResponse>(`/api/v1/users/get_remaining`, {
       params: { anon_id: anonId },
+      timeout: options?.timeoutMs ?? 8000,
+      signal: options?.signal,
     })
     return { success: true, data: res.data as GetBrochuresRemainingResponse }
   } catch (err) {
