@@ -12,7 +12,6 @@ import {
   Chip,
 } from '@heroui/react'
 
-import type { LanguageStore } from '../../stores/useLanguageStore'
 import { FORM_TEXT } from '../../lang/form'
 import { useTranslate } from '../../hooks/useTranslate'
 
@@ -20,7 +19,7 @@ import { useBrochuresRemainingStore } from '../../stores/useBrochuresRemaining'
 import { inputClassNames, textDefault, fieldWrapper } from './fieldStyles'
 
 
-type BrochureType = 'professional' | 'funny'
+import type { LanguageStore, BrochureType } from '../../types'
 
 interface BrochureFormProps {
   isLoading: boolean
@@ -28,14 +27,15 @@ interface BrochureFormProps {
   url: string
   language: LanguageStore
   brochureType: BrochureType
-  onCompanyNameChange: (v: string) => void
-  onUrlChange: (v: string) => void
-  onLanguageChange: (v: LanguageStore) => void
-  onBrochureTypeChange: (v: BrochureType) => void
-  onSubmit: () => void | Promise<void>
+  onCompanyNameChange: (value: string) => void
+  onUrlChange: (value: string) => void
+  onLanguageChange: (value: LanguageStore) => void
+  onBrochureTypeChange: (value: BrochureType) => void
+  onSubmit: () => void
 }
 
-const BrochureForm = ({
+
+const BrochureForm: React.FC<BrochureFormProps> = ({
   isLoading,
   companyName,
   url,

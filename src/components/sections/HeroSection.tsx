@@ -13,7 +13,7 @@ import { useBrochureSubmit } from '../../hooks/useBrochureSubmit'
 import { showErrorToast, showSuccessToast } from '../../utils/toasts'
 import { PREVIEW_TEXT } from '../../lang/preview'
 import { FORM_TEXT } from '../../lang/form'
-import type { LanguageStore } from '../../stores/useLanguageStore'
+import type { LanguageStore, BrochureType } from '../../types'
 
 const CHIP_ICONS = [
   <CheckCircle2 key="c1" size={14} />,
@@ -33,12 +33,12 @@ export const HeroSection = () => {
   const [formCompanyName, setFormCompanyName] = useState<string>(companyName ?? '')
   const [formUrl, setFormUrl] = useState<string>(url ?? '')
   const [formLanguage, setFormLanguage] = useState<LanguageStore>(language)
-  const [formType, setFormType] = useState<'professional' | 'funny'>(brochureType)
+  const [formType, setFormType] = useState<BrochureType>(brochureType)
 
   // Estado controlado para Tabs. Por defecto, formulario.
   const [selectedTab, setSelectedTab] = useState<'brochure-form' | 'brochure-preview'>('brochure-form')
 
-  const performSubmit = async (payload: { companyName: string; url: string; language: LanguageStore; brochureType: 'professional' | 'funny' }) => {
+  const performSubmit = async (payload: { companyName: string; url: string; language: LanguageStore; brochureType: BrochureType }) => {
     const result = await submitBrochure(payload)
     if (!result.success) {
       if (result.status === 429) {
