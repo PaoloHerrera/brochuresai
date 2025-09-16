@@ -9,7 +9,7 @@ import { useAnonIdStore } from './stores/useAnonId'
 import { useBrochuresRemainingStore } from './stores/useBrochuresRemaining'
 import { showErrorToast } from './utils/toasts'
 import { useTranslate } from './hooks/useTranslate'
-import { FORM_TEXT } from './lang/form'
+import { APP_TEXT } from './lang/app'
 
 // Lazy components
 const HowItWorksSectionLazy = lazy(() => import('./components/sections/HowItWorksSection').then(m => ({ default: m.HowItWorksSection })))
@@ -22,7 +22,7 @@ function App() {
 
   const {anonId, setAnonId} = useAnonIdStore()
   const {setBrochuresRemaining} = useBrochuresRemainingStore()
-  const { t } = useTranslate(FORM_TEXT)
+  const { t } = useTranslate(APP_TEXT)
 
   useEffect(() => {
     let cancelled = false
@@ -35,11 +35,11 @@ function App() {
         setAnonId(res.data.anon_id)
       } else {
         // Fallback seguro si hay error: no sobreescribir si ya existe, o setear mínimos
-        showErrorToast(t.errorTitle, t.errorDescription)
+        showErrorToast(t.error.errorRemaining.title, t.error.errorRemaining.description)
       }
     }).catch(() => {
       // Evitar crash si se rechaza la promesa
-      showErrorToast(t.errorTitle, t.errorDescription)
+      showErrorToast(t.error.errorRemaining.title, t.error.errorRemaining.description)
     })
 
     return () => { cancelled = true; controller.abort() }
