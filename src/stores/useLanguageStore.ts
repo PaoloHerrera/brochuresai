@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
-export type LanguageStore = 'en' | 'es'	
+import type { LanguageStore } from '../types'
 
 interface LanguageState {
   language: LanguageStore

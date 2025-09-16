@@ -1,22 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import axios, { isAxiosError } from 'axios'
-import { API_BASE_URL } from '../config'
+import { apiPost, isAxiosError } from '../services/http'
 
 import { useBrochureStore } from '../stores/useBrochureStore'
 import { useBrochuresRemainingStore } from '../stores/useBrochuresRemaining'
 import { useAnonIdStore } from '../stores/useAnonId'
-import type {LanguageStore} from '../stores/useLanguageStore'
-
-export interface BrochureSubmitData {
-  companyName: string
-  url: string
-  language: LanguageStore
-  brochureType: 'professional' | 'funny'
-}
-
-export type BrochureSubmitResult =
-  | { success: true }
-  | { success: false; status?: number; error?: unknown }
+import type { BrochureSubmitData, BrochureSubmitResult } from '../types'
 
 export const useBrochureSubmit = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -43,8 +31,8 @@ export const useBrochureSubmit = () => {
     controllerRef.current = controller
 
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/v1/create_brochure`,
+      const response = await apiPost(
+        '/api/v1/create_brochure',
         {
           anon_id: anonId,
           company_name: data.companyName,
@@ -58,9 +46,9 @@ export const useBrochureSubmit = () => {
         }
       )
 
-      setBrochure(response.data.brochure)
-      setCacheKey(response.data.cache_key)
-      setBrochuresRemaining(response.data.brochures_remaining)
+      setBrochure((response.data as { brochure: string }).brochure)
+      setCacheKey((response.data as { cache_key: string }).cache_key)
+      setBrochuresRemaining((response.data as { brochures_remaining: number }).brochures_remaining)
 
       // Persistimos la "última sumisión válida" sólo tras éxito
       setLastSubmission({
