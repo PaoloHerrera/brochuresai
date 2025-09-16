@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 
 import { useBrochureStore } from '../useBrochureStore'
-import type { LanguageStore } from '../useLanguageStore'
+import type { LanguageStore } from '../../types'
 
 const resetStore = () => {
   const s = useBrochureStore.getState()

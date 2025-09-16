@@ -3,8 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import BrochureForm from '../BrochureForm'
 import { renderWithProviders } from '../../../test/test-utils'
-import { setLanguage, selectButtonByName } from '../../../test/test-helpers'
-import { useBrochuresRemainingStore } from '../../../stores/useBrochuresRemaining'
+import { setLanguage, selectButtonByName, resetStores } from '../../../test/test-helpers'
 
 // Utilidad para montar el componente con props mínimas
 const renderForm = (overrides: Partial<Parameters<typeof BrochureForm>[0]> = {}) => {
@@ -28,10 +27,9 @@ const renderForm = (overrides: Partial<Parameters<typeof BrochureForm>[0]> = {})
 
 describe('BrochureForm (presentacional)', () => {
   beforeEach(async () => {
-    // Asegurar idioma en inglés para textos predecibles
+    // Estado base consistente y idioma en inglés para textos predecibles
+    resetStores()
     await setLanguage('en')
-    // Por defecto permitir generar (restantes > 0)
-    useBrochuresRemainingStore.setState({ brochuresRemaining: 3 })
   })
 
   it('renderiza valores iniciales y propaga onChange para inputs de texto', async () => {

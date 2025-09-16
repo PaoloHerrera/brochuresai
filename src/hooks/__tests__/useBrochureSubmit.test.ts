@@ -1,25 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { renderHook, act, waitFor } from '@testing-library/react'
-import axios from 'axios'
+// axios import eliminado: no se usa en este archivo
 
 import { useBrochureSubmit } from '../useBrochureSubmit'
 import { useBrochureStore } from '../../stores/useBrochureStore'
 import { useBrochuresRemainingStore } from '../../stores/useBrochuresRemaining'
-import { useAnonUserIdStore } from '../../stores/useAnonUserId'
-import type { LanguageStore } from '../../stores/useLanguageStore'
-import { makeAxiosResponse, makeAxiosError, makeCanceledError } from '../../test/test-helpers'
+import { useAnonIdStore } from '../../stores/useAnonId'
+import type { LanguageStore } from '../../types'
+import { makeAxiosResponse, makeAxiosError, makeCanceledError, asAxios, resetStores } from '../../test/test-helpers'
 
-vi.mock('axios', () => {
-  const post = vi.fn()
-  const mocked = {
-    default: { post },
-    post,
-    isAxiosError: (err: unknown) => !!err && typeof err === 'object' && 'isAxiosError' in err,
-  }
-  return mocked as unknown as typeof axios
-})
-
-const asAxios = () => (axios as unknown as { post: ReturnType<typeof vi.fn> })
+// asAxios centralizado en test-helpers
 
 // Tipos auxiliares para respuestas simuladas de la API y fábrica de respuestas
 interface ApiGenerateResponse {
@@ -36,31 +26,15 @@ const makePayload = (overrides?: Partial<{ companyName: string; url: string; lan
   ...overrides,
 })
 
-const resetStores = () => {
-  useBrochureStore.setState({
-    companyName: '',
-    url: '',
-    language: 'en',
-    brochure: '',
-    brochureType: 'professional',
-    cacheKey: '',
-    setBrochure: useBrochureStore.getState().setBrochure,
-    setUrl: useBrochureStore.getState().setUrl,
-    setLanguage: useBrochureStore.getState().setLanguage,
-    setBrochureType: useBrochureStore.getState().setBrochureType,
-    setCompanyName: useBrochureStore.getState().setCompanyName,
-    setCacheKey: useBrochureStore.getState().setCacheKey,
-    setLastSubmission: useBrochureStore.getState().setLastSubmission,
-  })
-  useBrochuresRemainingStore.setState({ brochuresRemaining: 0, setBrochuresRemaining: useBrochuresRemainingStore.getState().setBrochuresRemaining })
-  useAnonUserIdStore.setState({ anonUserId: '', setAnonUserId: useAnonUserIdStore.getState().setAnonUserId })
-}
+// resetStores centralizado en test-helpers
 
 describe('useBrochureSubmit', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     resetStores()
-    useAnonUserIdStore.getState().setAnonUserId('anon-123')
+    // Para este archivo, los casos de error esperan remaining=0 al final (no update); ajustamos el valor base a 0
+    useBrochuresRemainingStore.getState().setBrochuresRemaining(0)
+    useAnonIdStore.getState().setAnonId('anon-123')
   })
 
   it('éxito: retorna success=true y actualiza stores (brochure, cacheKey, remaining y lastSubmission)', async () => {
@@ -197,11 +171,11 @@ describe('useBrochureSubmit', () => {
     expect(remainingStore.brochuresRemaining).toBe(0)
   })
 
-  it('envía anon_id vacío si anonUserId no existe y aún así genera y actualiza stores', async () => {
+  it('envía anon_id vacío si anonId no existe y aún así genera y actualiza stores', async () => {
     const payload = makePayload()
 
-    // Forzar anonUserId vacío en el store
-    useAnonUserIdStore.getState().setAnonUserId('')
+    // Forzar anonId vacío en el store
+    useAnonIdStore.getState().setAnonId('')
 
     // Respuesta exitosa de la API
     asAxios().post.mockResolvedValueOnce(
