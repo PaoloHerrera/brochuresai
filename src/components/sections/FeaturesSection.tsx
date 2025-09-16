@@ -52,7 +52,7 @@ export const FeaturesSection = () => {
         const [{ default: SliderCtor }] = await Promise.all([
           import('react-slick'),
           import('slick-carousel/slick/slick.css'),
-          import('slick-carousel/slick/slick-theme.css'),
+          // Nota: removemos slick-theme.css para reducir ~12KB; no usamos dots/arrows por defecto
         ])
         if (!cancelled) setSliderComp(() => (SliderCtor as unknown as new (props: SliderProps) => Slider))
       } catch {

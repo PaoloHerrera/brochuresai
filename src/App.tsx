@@ -7,6 +7,9 @@ import { NavbarUI } from './components/ui/NavbarUI'
 import { getBrochuresRemaining } from './services/getBrochuresRemaining'
 import { useAnonIdStore } from './stores/useAnonId'
 import { useBrochuresRemainingStore } from './stores/useBrochuresRemaining'
+import { showErrorToast } from './utils/toasts'
+import { useTranslate } from './hooks/useTranslate'
+import { FORM_TEXT } from './lang/form'
 
 // Lazy components
 const HowItWorksSectionLazy = lazy(() => import('./components/sections/HowItWorksSection').then(m => ({ default: m.HowItWorksSection })))
@@ -19,24 +22,28 @@ function App() {
 
   const {anonId, setAnonId} = useAnonIdStore()
   const {setBrochuresRemaining} = useBrochuresRemainingStore()
+  const { t } = useTranslate(FORM_TEXT)
 
   useEffect(() => {
     let cancelled = false
-    getBrochuresRemaining(anonId).then((res) => {
+    const controller = new AbortController()
+
+    getBrochuresRemaining(anonId, { signal: controller.signal, timeoutMs: 8000 }).then((res) => {
       if (cancelled) return
       if (res && res.success) {
         setBrochuresRemaining(res.data.brochures_remaining)
         setAnonId(res.data.anon_id)
       } else {
         // Fallback seguro si hay error: no sobreescribir si ya existe, o setear mínimos
-        // Podríamos mostrar un toast en el futuro; por ahora, solo no crashear.
-        // setBrochuresRemaining(0)
+        showErrorToast(t.errorTitle, t.errorDescription)
       }
     }).catch(() => {
       // Evitar crash si se rechaza la promesa
+      showErrorToast(t.errorTitle, t.errorDescription)
     })
-    return () => { cancelled = true }
-  }, [anonId, setAnonId, setBrochuresRemaining])
+
+    return () => { cancelled = true; controller.abort() }
+  }, [anonId, setAnonId, setBrochuresRemaining, t])
 
 
   return (
