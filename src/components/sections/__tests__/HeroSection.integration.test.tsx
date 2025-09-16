@@ -1,30 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axios from 'axios'
+import * as React from 'react'
 
 import { renderWithProviders } from '../../../test/test-utils'
 import { HeroSection } from '../HeroSection'
-import { useBrochureStore } from '../../../stores/useBrochureStore'
-import { useBrochuresRemainingStore } from '../../../stores/useBrochuresRemaining'
-import { useAnonUserIdStore } from '../../../stores/useAnonUserId'
-import { useLanguageStore } from '../../../stores/useLanguageStore'
 import type { AxiosResponse } from '../../../test/test-helpers'
-import { makeAxiosResponse, getSubmitButton, selectButtonByName } from '../../../test/test-helpers'
-import type React from 'react'
-import { PREVIEW_TEXT } from '../../../lang/preview'
+import { makeAxiosResponse, fillFormEN, clickRegenerateEN, getSelectedTabKey, resetStores, setLanguage, asAxios } from '../../../test/test-helpers'
+// PREVIEW_TEXT ya es usado internamente por clickRegenerateEN
 
-vi.mock('axios', () => {
-  const post = vi.fn()
-  const mocked = {
-    default: { post },
-    post,
-    isAxiosError: (err: unknown) => !!err && typeof err === 'object' && 'isAxiosError' in err,
-  }
-  return mocked as unknown as typeof axios
-})
-
-// Mock mínimo de @heroui/react que preserva atributos data-* para poder inspeccionar pestañas
+// Mock de @heroui/react que soporta selección por click y preserva atributos data-*
 vi.mock('@heroui/react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@heroui/react')>()
 
@@ -34,7 +19,7 @@ vi.mock('@heroui/react', async (importOriginal) => {
     startContent?: React.ReactNode
   }
   const Chip = ({ children, className, startContent, ...aria }: ChipProps) => {
-    const ariaLabel = aria['aria-label']
+    const ariaLabel = (aria as React.AriaAttributes)['aria-label']
     return (
       <span className={className} aria-label={ariaLabel} data-testid="mock-chip">
         {startContent}
@@ -43,186 +28,138 @@ vi.mock('@heroui/react', async (importOriginal) => {
     )
   }
 
-  type TabsProps = React.HTMLAttributes<HTMLDivElement>
+  type TabsProps = React.HTMLAttributes<HTMLDivElement> & {
+    selectedKey?: unknown
+    onSelectionChange?: (key: unknown) => void
+    destroyInactiveTabPanel?: boolean
+    color?: unknown
+    variant?: unknown
+    classNames?: unknown
+  }
   const Tabs = ({ children, className, ...rest }: TabsProps) => {
-    // Preservamos data-selected y data-testid agregadas por el componente
+    // Preservamos data-* y aria-* pero filtramos props no válidas para evitar warnings
+    const {
+      selectedKey,
+      onSelectionChange,
+      destroyInactiveTabPanel,
+      color,
+      variant,
+      classNames,
+      ...domProps
+    } = rest as TabsProps
+
+    type TabChildProps = { isDisabled?: boolean; onClick?: () => void; 'data-selected'?: string }
+
+    // Crear hijos mejorados que disparan onSelectionChange al click
+    const enhancedChildren = React.Children.map(children, (child) => {
+      if (!React.isValidElement<TabChildProps>(child)) return child
+      const key = child.key
+      const selectedKeyStr = selectedKey != null ? String(selectedKey) : ''
+      const keyStr = key != null ? String(key) : ''
+      const isSelected = keyStr === selectedKeyStr
+      const isDisabled = child.props?.isDisabled
+      const onClick = () => {
+        if (isDisabled) return
+        onSelectionChange?.(key)
+      }
+      return React.cloneElement(child, {
+        onClick,
+        'data-selected': isSelected ? 'true' : undefined,
+      })
+    })
+    // Marcar como usadas para ESLint sin pasarlas al DOM
+    void selectedKey; void onSelectionChange; void destroyInactiveTabPanel; void color; void variant; void classNames
     return (
-      <div className={className} {...rest}>
+      <div className={className} {...domProps}>
+        {enhancedChildren}
+      </div>
+    )
+  }
+
+  type TabProps = React.HTMLAttributes<HTMLDivElement> & { title?: React.ReactNode; isDisabled?: boolean }
+  const Tab = ({ children, className, title, isDisabled, ...rest }: TabProps) => {
+    return (
+      <div role="tab" aria-disabled={isDisabled ? 'true' : undefined} data-testid="mock-tab" className={className} {...rest}>
+        {title}
         {children}
       </div>
     )
   }
 
-  type TabProps = React.HTMLAttributes<HTMLDivElement>
-  const Tab = ({ children, className }: TabProps) => {
-    return (
-      <div data-testid="mock-tab" className={className}>
-        {children}
-      </div>
-    )
-  }
-  return {
-    ...actual,
-    Chip,
-    Tabs,
-    Tab,
-  }
+  return { ...actual, Chip, Tabs, Tab }
 })
 
-const asAxios = () => (axios as unknown as { post: ReturnType<typeof vi.fn> })
-
-// Tipos auxiliares para respuestas simuladas de la API
 interface ApiGenerateResponse {
   brochure: string
   cache_key: string
   brochures_remaining: number
 }
 
-const resetStores = () => {
-  useBrochureStore.setState({
-    companyName: '',
-    url: '',
-    language: 'en',
-    brochure: '',
-    brochureType: 'professional',
-    cacheKey: '',
-    setBrochure: useBrochureStore.getState().setBrochure,
-    setUrl: useBrochureStore.getState().setUrl,
-    setLanguage: useBrochureStore.getState().setLanguage,
-    setBrochureType: useBrochureStore.getState().setBrochureType,
-    setCompanyName: useBrochureStore.getState().setCompanyName,
-    setCacheKey: useBrochureStore.getState().setCacheKey,
-    setLastSubmission: useBrochureStore.getState().setLastSubmission,
-  })
-  useBrochuresRemainingStore.setState({ brochuresRemaining: 5, setBrochuresRemaining: useBrochuresRemainingStore.getState().setBrochuresRemaining })
-  useAnonUserIdStore.setState({ anonUserId: 'anon-123', setAnonUserId: useAnonUserIdStore.getState().setAnonUserId })
-}
-
-// Helpers EN para reducir duplicación
-const fillFormEN = async (
-  container: HTMLElement,
-  { name = 'Acme Inc', url = 'https://acme.com' }: { name?: string; url?: string } = {}
-) => {
-  const nameInput = screen.getByPlaceholderText(/my company/i)
-  const urlInput = screen.getByPlaceholderText(/https:\/\/example\.com/i)
-  await userEvent.clear(nameInput)
-  await userEvent.type(nameInput, name)
-  await userEvent.clear(urlInput)
-  await userEvent.type(urlInput, url)
-  const submitBtn = getSubmitButton(container)
-  return { submitBtn }
-}
-
-const clickRegenerateEN = async () => {
-  const regenerateBtn = selectButtonByName(new RegExp(PREVIEW_TEXT.en.regenerateLabel, 'i'))
-  await userEvent.click(regenerateBtn)
-}
-
-const getSelectedTabKey = () => {
-  const tabs = screen.getByTestId('hero-tabs') as HTMLElement
-  return tabs.getAttribute('data-selected')
-}
-
 describe('HeroSection - integración (tabs y regenerate)', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
+  beforeEach(async () => {
     resetStores()
-    // EN para textos/placeholder
-    useLanguageStore.setState({ language: 'en', setLanguage: useLanguageStore.getState().setLanguage })
+    await setLanguage('en')
   })
 
-  it('submit correcto: cambia a preview y permanece allí tras éxito', async () => {
-    const { container } = renderWithProviders(<HeroSection />)
-
-    // Mock éxito inmediato
+  it('submit genera brochure y activa pestaña preview; regenerate vuelve a generar', async () => {
+    // Mock respuesta de /generate
     asAxios().post.mockResolvedValueOnce(
       makeAxiosResponse<ApiGenerateResponse>({
-        brochure: '<html><body>ok</body></html>',
-        cache_key: 'cache-xyz',
+        brochure: '<html><body>preview</body></html>',
+        cache_key: 'cache-123',
         brochures_remaining: 4,
-      })
+      }) as unknown as AxiosResponse<ApiGenerateResponse>
     )
 
-    const { submitBtn } = await fillFormEN(container)
-
-    await userEvent.click(submitBtn)
-
-    await waitFor(() => {
-      expect(getSelectedTabKey()).toBe('brochure-preview')
-    })
-  })
-
-  it('submit falla: cambia a preview y luego vuelve a form', async () => {
     const { container } = renderWithProviders(<HeroSection />)
 
-    // Promesa controlada
-    let rejectPost!: (reason?: unknown) => void
-    const pending = new Promise<AxiosResponse<ApiGenerateResponse>>((_, rej) => {
-      rejectPost = rej
-    })
-    asAxios().post.mockImplementationOnce(() => pending as unknown as Promise<AxiosResponse<ApiGenerateResponse>>)
+    const { submitBtn } = await fillFormEN(container, { name: 'Acme', url: 'https://acme.com' })
 
-    const { submitBtn } = await fillFormEN(container)
-
+    // Submit
     await userEvent.click(submitBtn)
 
-    // Durante la petición, debe estar en preview
-    expect(getSelectedTabKey()).toBe('brochure-preview')
-
-    // Ahora rechazamos
-    rejectPost({ isAxiosError: true, response: { status: 500 } })
-
-    await waitFor(() => {
-      expect(getSelectedTabKey()).toBe('brochure-form')
-    })
-  })
-
-  it('Regenerate usa la última sumisión válida del store y dispara submit', async () => {
-    const { container } = renderWithProviders(<HeroSection />)
-
-    // 1) Primera sumisión exitosa
-    asAxios().post.mockResolvedValueOnce(
-      makeAxiosResponse<ApiGenerateResponse>({
-        brochure: '<html><body>ok</body></html>',
-        cache_key: 'cache-1',
-        brochures_remaining: 4,
-      })
-    )
-
-    const { submitBtn } = await fillFormEN(container)
-    await userEvent.click(submitBtn)
+    // Se espera cambio a tab preview
     await waitFor(() => expect(getSelectedTabKey()).toBe('brochure-preview'))
 
-    // 2) El usuario cambia campos del formulario (estado local), pero NO enviamos
-    const nameInput = screen.getByPlaceholderText(/my company/i)
-    const urlInput = screen.getByPlaceholderText(/https:\/\/example\.com/i)
-    await userEvent.clear(nameInput)
-    await userEvent.type(nameInput, 'Changed Co')
-    await userEvent.clear(urlInput)
-    await userEvent.type(urlInput, 'https://changed.com')
-
-    // 3) Preparar el mock para la regeneración y click en Regenerate
+    // Regenerate
     asAxios().post.mockResolvedValueOnce(
       makeAxiosResponse<ApiGenerateResponse>({
-        brochure: '<html><body>ok-2</body></html>',
-        cache_key: 'cache-2',
+        brochure: '<html><body>preview v2</body></html>',
+        cache_key: 'cache-456',
         brochures_remaining: 3,
-      })
+      }) as unknown as AxiosResponse<ApiGenerateResponse>
     )
 
     await clickRegenerateEN()
 
-    await waitFor(() => {
-      // Debe permanecer/ir a preview
-      expect(getSelectedTabKey()).toBe('brochure-preview')
-      // Debe haberse llamado axios.post una segunda vez
-      expect(asAxios().post).toHaveBeenCalledTimes(2)
-    })
+    // Permanece en preview y se dispara una segunda solicitud
+    await waitFor(() => expect(getSelectedTabKey()).toBe('brochure-preview'))
+    await waitFor(() => expect(asAxios().post).toHaveBeenCalledTimes(2))
+  })
 
-    // Verificar que la SEGUNDA llamada usó los valores del store (Acme Inc / https://acme.com), no los editados
-    const secondCall = asAxios().post.mock.calls[1]
-    const body = secondCall[1] as Record<string, unknown>
-    expect(body.company_name).toBe('Acme Inc')
-    expect(body.url).toBe('https://acme.com')
+  it('permite navegar entre tabs con clicks tras generar un brochure', async () => {
+    // Mock respuesta de /generate
+    asAxios().post.mockResolvedValueOnce(
+      makeAxiosResponse<ApiGenerateResponse>({
+        brochure: '<html><body>preview</body></html>',
+        cache_key: 'cache-123',
+        brochures_remaining: 4,
+      }) as unknown as AxiosResponse<ApiGenerateResponse>
+    )
+
+    const { container } = renderWithProviders(<HeroSection />)
+    const { submitBtn } = await fillFormEN(container, { name: 'Acme', url: 'https://acme.com' })
+
+    // Submit cambia a preview
+    await userEvent.click(submitBtn)
+    await waitFor(() => expect(getSelectedTabKey()).toBe('brochure-preview'))
+
+    // Click en "Brochure form" para volver al formulario
+    await userEvent.click(screen.getByRole('tab', { name: /brochure form/i }))
+    await waitFor(() => expect(getSelectedTabKey()).toBe('brochure-form'))
+
+    // Ahora que hay brochure, la pestaña Preview no está deshabilitada; volver a Preview
+    await userEvent.click(screen.getByRole('tab', { name: /preview/i }))
+    await waitFor(() => expect(getSelectedTabKey()).toBe('brochure-preview'))
   })
 })

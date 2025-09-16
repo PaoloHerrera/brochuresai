@@ -1,11 +1,10 @@
+import '@testing-library/jest-dom/vitest'
 import { screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '../../../test/test-utils'
 import { BrochurePreview } from '../BrochurePreview'
-import { useBrochureStore } from '../../../stores/useBrochureStore'
 import { describe, beforeEach, it, expect, vi } from 'vitest'
-import type { BrochureState } from '../../../stores/useBrochureStore'
-import { setLanguage, selectButtonByName, makePdfBlob, withBlobUrlSpies } from '../../../test/test-helpers'
+import { setLanguage, selectButtonByName, makePdfBlob, withBlobUrlSpies, resetStores, seedRegenerateEN, silenceToasts } from '../../../test/test-helpers'
 import * as toasts from '../../../utils/toasts'
 import { PREVIEW_TEXT } from '../../../lang/preview'
 
@@ -18,26 +17,15 @@ vi.mock('../../../hooks/useBrochureDownload', () => ({
   }),
 }))
 
-// Helper para estado inicial del store
-const setupStore = () => {
-  const { setBrochure, setCacheKey, setCompanyName } = useBrochureStore.getState() as BrochureState
-  setCompanyName('Acme Inc')
-  setBrochure('<html><body><h1>Preview</h1></body></html>')
-  setCacheKey('cache-123')
-}
-
 describe('BrochurePreview', () => {
   beforeEach(async () => {
-    // reset store state between tests
-    useBrochureStore.setState({ companyName: '', brochure: '', cacheKey: '' })
-
-    // Reset language to English before each test
+    // Estado consistente: limpiar stores, idioma EN y semilla válida de preview
+    resetStores()
     await setLanguage('en')
-
-    // Reset mocks
     mockDownloadPdf.mockReset()
-
-    setupStore()
+    seedRegenerateEN()
+    // Silenciar toasts por defecto; cada test que valide toasts usará su propio spy
+    silenceToasts()
   })
 
   it('muestra textos traducidos en EN por defecto', () => {
@@ -66,7 +54,8 @@ describe('BrochurePreview', () => {
   })
 
   it('deshabilita el botón cuando no hay brochure', () => {
-    useBrochureStore.setState({ companyName: '', brochure: '', cacheKey: '' })
+    // Reiniciar a estado vacío
+    resetStores()
     renderWithProviders(<BrochurePreview />)
 
     // The download button should be disabled when there's no brochure/cache
@@ -102,7 +91,7 @@ describe('BrochurePreview', () => {
 
       // Wait for the download to complete
       await waitFor(() => {
-        expect(mockDownloadPdf).toHaveBeenCalledWith('cache-123')
+        expect(mockDownloadPdf).toHaveBeenCalledWith('cache-prev')
       })
     })
   })
@@ -112,7 +101,7 @@ describe('BrochurePreview', () => {
     mockDownloadPdf.mockResolvedValueOnce({ success: false })
 
     // Espiar el toast y evitar ejecutar la implementación real
-    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(async () => {})
     const createUrlSpy = vi.spyOn(URL, 'createObjectURL')
 
     renderWithProviders(<BrochurePreview />)
@@ -121,7 +110,7 @@ describe('BrochurePreview', () => {
     await userEvent.click(downloadBtn)
 
     await waitFor(() => {
-      expect(mockDownloadPdf).toHaveBeenCalledWith('cache-123')
+      expect(mockDownloadPdf).toHaveBeenCalledWith('cache-prev')
       expect(toastSpy).toHaveBeenCalledWith(PREVIEW_TEXT.en.errorTitle, PREVIEW_TEXT.en.errorDescription)
       expect(createUrlSpy).not.toHaveBeenCalled()
     })
@@ -134,7 +123,7 @@ describe('BrochurePreview', () => {
     // Forzar fallo de descarga
     mockDownloadPdf.mockResolvedValueOnce({ success: false })
 
-    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(async () => {})
     const createUrlSpy = vi.spyOn(URL, 'createObjectURL')
 
     renderWithProviders(<BrochurePreview />)
@@ -148,7 +137,7 @@ describe('BrochurePreview', () => {
     await userEvent.click(downloadBtn)
 
     await waitFor(() => {
-      expect(mockDownloadPdf).toHaveBeenCalledWith('cache-123')
+      expect(mockDownloadPdf).toHaveBeenCalledWith('cache-prev')
       expect(toastSpy).toHaveBeenCalledWith(PREVIEW_TEXT.es.errorTitle, PREVIEW_TEXT.es.errorDescription)
       expect(createUrlSpy).not.toHaveBeenCalled()
     })

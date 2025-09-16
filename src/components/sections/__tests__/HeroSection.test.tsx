@@ -1,31 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axios from 'axios'
 
 import { renderWithProviders } from '../../../test/test-utils'
 import { HeroSection } from '../HeroSection'
 import { useBrochureStore } from '../../../stores/useBrochureStore'
-import { useBrochuresRemainingStore } from '../../../stores/useBrochuresRemaining'
-import { useAnonUserIdStore } from '../../../stores/useAnonUserId'
 import { useLanguageStore } from '../../../stores/useLanguageStore'
 import type { AxiosResponse } from '../../../test/test-helpers'
-import { makeAxiosResponse, getSubmitButton } from '../../../test/test-helpers'
-import { selectButtonByName } from '../../../test/test-helpers'
+import { makeAxiosResponse, getSubmitButton, resetStores, seedRegenerateEN, fillFormEN, clickRegenerateEN, asAxios, silenceToasts } from '../../../test/test-helpers'
 import type React from 'react'
 import * as toasts from '../../../utils/toasts'
 import { FORM_TEXT } from '../../../lang/form'
 import { PREVIEW_TEXT } from '../../../lang/preview'
-
-vi.mock('axios', () => {
-  const post = vi.fn()
-  const mocked = {
-    default: { post },
-    post,
-    isAxiosError: (err: unknown) => !!err && typeof err === 'object' && 'isAxiosError' in err,
-  }
-  return mocked as unknown as typeof axios
-})
 
 // Mock mínimo de @heroui/react para evitar warnings de atributos booleanos (p.ej. `inert`) en Tabs/Tab
 vi.mock('@heroui/react', async (importOriginal) => {
@@ -74,71 +60,13 @@ vi.mock('@heroui/react', async (importOriginal) => {
   }
 })
 
-const asAxios = () => (axios as unknown as { post: ReturnType<typeof vi.fn> })
+// const asAxios = () => (axios as unknown as { post: ReturnType<typeof vi.fn> })
 
 // Tipos auxiliares para respuestas simuladas de la API
 interface ApiGenerateResponse {
   brochure: string
   cache_key: string
   brochures_remaining: number
-}
-
-const resetStores = () => {
-  useBrochureStore.setState({
-    companyName: '',
-    url: '',
-    language: 'en',
-    brochure: '',
-    brochureType: 'professional',
-    cacheKey: '',
-    setBrochure: useBrochureStore.getState().setBrochure,
-    setUrl: useBrochureStore.getState().setUrl,
-    setLanguage: useBrochureStore.getState().setLanguage,
-    setBrochureType: useBrochureStore.getState().setBrochureType,
-    setCompanyName: useBrochureStore.getState().setCompanyName,
-    setCacheKey: useBrochureStore.getState().setCacheKey,
-    setLastSubmission: useBrochureStore.getState().setLastSubmission,
-  })
-  useBrochuresRemainingStore.setState({ brochuresRemaining: 5, setBrochuresRemaining: useBrochuresRemainingStore.getState().setBrochuresRemaining })
-  useAnonUserIdStore.setState({ anonUserId: 'anon-123', setAnonUserId: useAnonUserIdStore.getState().setAnonUserId })
-}
-
-// Helpers EN only to reduce duplication across tests
-const fillFormEN = async (
-  container: HTMLElement,
-  { name = 'Acme Inc', url = 'https://acme.com' }: { name?: string; url?: string } = {}
-) => {
-  const nameInput = screen.getByPlaceholderText(/my company/i)
-  const urlInput = screen.getByPlaceholderText(/https:\/\/example\.com/i)
-  await userEvent.clear(nameInput)
-  await userEvent.type(nameInput, name)
-  await userEvent.clear(urlInput)
-  await userEvent.type(urlInput, url)
-  const submitBtn = getSubmitButton(container)
-  return { submitBtn }
-}
-
-const seedRegenerateEN = () => {
-  useBrochureStore.setState({
-    companyName: 'Acme Inc',
-    url: 'https://acme.com',
-    language: 'en',
-    brochure: '<html><body>preview</body></html>',
-    brochureType: 'professional',
-    cacheKey: 'cache-prev',
-    setBrochure: useBrochureStore.getState().setBrochure,
-    setUrl: useBrochureStore.getState().setUrl,
-    setLanguage: useBrochureStore.getState().setLanguage,
-    setBrochureType: useBrochureStore.getState().setBrochureType,
-    setCompanyName: useBrochureStore.getState().setCompanyName,
-    setCacheKey: useBrochureStore.getState().setCacheKey,
-    setLastSubmission: useBrochureStore.getState().setLastSubmission,
-  })
-}
-
-const clickRegenerateEN = async () => {
-  const regenerateBtn = selectButtonByName(new RegExp(PREVIEW_TEXT.en.regenerateLabel, 'i'))
-  await userEvent.click(regenerateBtn)
 }
 
 describe('HeroSection - guards de isLoading', () => {
@@ -148,8 +76,7 @@ describe('HeroSection - guards de isLoading', () => {
     // Asegurar idioma EN para textos y placeholders esperados
     useLanguageStore.setState({ language: 'en', setLanguage: useLanguageStore.getState().setLanguage })
     // Evitar renders de toasts reales en estos tests de guards
-    vi.spyOn(toasts, 'showSuccessToast').mockImplementation(() => {})
-    vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    silenceToasts()
   })
 
   it('ignora segundo submit cuando isLoading es true (no hay doble llamada a axios)', async () => {
@@ -262,7 +189,7 @@ describe('HeroSection - toasts', () => {
   })
 
   it('handleRegenerate sin valores previos muestra toast de error de regeneración (EN)', async () => {
-    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(async () => {})
 
     renderWithProviders(<HeroSection />)
 
@@ -277,7 +204,7 @@ describe('HeroSection - toasts', () => {
   })
 
   it('submit fails with 429 shows limit toast (EN)', async () => {
-    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(async () => {})
 
     const { container } = renderWithProviders(<HeroSection />)
 
@@ -295,7 +222,7 @@ describe('HeroSection - toasts', () => {
   })
 
   it('regenerate fails with 429 shows limit toast (EN)', async () => {
-    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(async () => {})
 
     // Prepara el store con datos válidos para regenerate en EN
     seedRegenerateEN()
@@ -315,7 +242,7 @@ describe('HeroSection - toasts', () => {
   })
 
   it('submit success shows success toast (EN)', async () => {
-    const toastSpy = vi.spyOn(toasts, 'showSuccessToast').mockImplementation(() => {})
+    const toastSpy = vi.spyOn(toasts, 'showSuccessToast').mockImplementation(async () => {})
 
     const { container } = renderWithProviders(<HeroSection />)
 
@@ -335,7 +262,7 @@ describe('HeroSection - toasts', () => {
   })
 
   it('regenerate success shows success toast (EN)', async () => {
-    const toastSpy = vi.spyOn(toasts, 'showSuccessToast').mockImplementation(() => {})
+    const toastSpy = vi.spyOn(toasts, 'showSuccessToast').mockImplementation(async () => {})
 
     // Prepara el store con datos válidos para regenerate
     seedRegenerateEN()
@@ -357,7 +284,7 @@ describe('HeroSection - toasts', () => {
   })
 
   it('submit fails with 500 shows error toast (EN)', async () => {
-    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(() => {})
+    const toastSpy = vi.spyOn(toasts, 'showErrorToast').mockImplementation(async () => {})
 
     const { container } = renderWithProviders(<HeroSection />)
 

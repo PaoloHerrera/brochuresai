@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 import { configure } from '@testing-library/react'
+import { vi } from 'vitest'
 
 // Configure React Testing Library
 configure({
@@ -66,4 +67,21 @@ Object.defineProperty(HTMLAnchorElement.prototype, 'click', {
     // This prevents the jsdom "Not implemented: navigation" warning
     // The test doesn't need to verify the actual click behavior, just that it was called
   },
+})
+
+// ---------------------------------------------------------------------------
+// Global axios mock for all tests
+// Centraliza el mock para evitar duplicación en cada archivo de test.
+// Incluye métodos utilizados en el código (post, get) y expone isAxiosError.
+// ---------------------------------------------------------------------------
+const __axiosPost = vi.fn()
+const __axiosGet = vi.fn()
+const __isAxiosError = (err: unknown) => !!err && typeof err === 'object' && 'isAxiosError' in (err as Record<string, unknown>)
+vi.mock('axios', () => {
+  return {
+    default: { post: __axiosPost, get: __axiosGet, isAxiosError: __isAxiosError },
+    post: __axiosPost,
+    get: __axiosGet,
+    isAxiosError: __isAxiosError,
+  }
 })
