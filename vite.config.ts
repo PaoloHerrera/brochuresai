@@ -14,20 +14,17 @@ export default defineConfig({
     css: true,
   },
   build: {
+    sourcemap: true,
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (!id) return undefined
           if (id.includes('node_modules')) {
-            // Agrupar toda la familia React en un solo chunk para evitar ciclos
-            const isReactFamily = /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id) || id.includes('react/jsx-runtime')
-            if (isReactFamily) return 'react-vendor'
-            if (id.includes('@heroui')) return 'heroui'
-            if (id.includes('lucide-react')) return 'icons'
-            // vendor genérico para el resto de node_modules
-            return 'vendor'
+            if (id.includes('@heroui')) return 'vendor-heroui'
+            if (id.includes('react-slick') || id.includes('slick-carousel')) return 'vendor-slick'
+            if (id.includes('axios')) return 'vendor-axios'
+            // Removed explicit vendor-react split to avoid runtime issues with React resolution
           }
-          return undefined
         },
       },
     },
