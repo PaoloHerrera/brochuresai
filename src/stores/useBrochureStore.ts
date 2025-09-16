@@ -1,20 +1,20 @@
 import {create} from 'zustand'
-import type { LanguageStore } from './useLanguageStore'
+import type { LanguageStore, BrochureType } from '../types'
 
 export interface BrochureState {
   companyName: string
   url: string
   language: LanguageStore
   brochure: string
-  brochureType: 'professional' | 'funny'
+  brochureType: BrochureType
   cacheKey: string
   setBrochure: (brochure: string) => void
   setCompanyName: (companyName: string) => void
   setCacheKey: (cacheKey: string) => void
   setUrl: (url: string) => void
   setLanguage: (language: LanguageStore) => void
-  setBrochureType: (brochureType: 'professional' | 'funny') => void
-  setLastSubmission: (payload: { companyName: string; url: string; language: LanguageStore; brochureType: 'professional' | 'funny' }) => void
+  setBrochureType: (brochureType: BrochureType) => void
+  setLastSubmission: (payload: { companyName: string; url: string; language: LanguageStore; brochureType: BrochureType }) => void
 }
 
 export const useBrochureStore = create<BrochureState>((set) => {

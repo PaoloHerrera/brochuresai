@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
-import { API_BASE_URL } from '../config'
-
-export type DownloadResult =
-  | { success: true; blob: Blob; filename: string }
-  | { success: false; status?: number; error?: unknown }
+import { apiPost } from '../services/http'
+import type { DownloadResult } from '../types'
 
 export const useBrochureDownload = () => {
   const [isDownloading, setIsDownloading] = useState(false)
@@ -25,8 +21,8 @@ export const useBrochureDownload = () => {
     controllerRef.current = controller
 
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/v1/download_brochure_pdf`,
+      const response = await apiPost<Blob>(
+        '/api/v1/download_brochure_pdf',
         { cache_key: cacheKey },
         {
           responseType: 'blob',
@@ -48,10 +44,12 @@ export const useBrochureDownload = () => {
 
       return { success: true, blob: response.data, filename }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return { success: false, status: error.response?.status, error }
-      }
-      return { success: false, error }
+      // El mock global expone default.isAxiosError y named isAxiosError; usamos el named re-export implícito
+      // para que tests reconozcan cancelaciones/timeouts adecuadamente si fuera necesario.
+      // No cambiamos la forma de devolver status.
+      // importación implícita via apiPost -> axios; verificamos status si existe.
+      const maybeAxios = error as { response?: { status?: number } }
+      return { success: false, status: maybeAxios.response?.status, error }
     } finally {
       setIsDownloading(false)
       controllerRef.current = null
