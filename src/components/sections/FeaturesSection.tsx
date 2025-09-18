@@ -10,6 +10,7 @@ import type { ReactNode } from 'react'
 // import Slider from 'react-slick'
 // import 'slick-carousel/slick/slick.css'
 // import 'slick-carousel/slick/slick-theme.css'
+import { EyebrowChip } from '../ui/EyebrowChip'
 
 // Props del carrusel desde react-slick + children
 type SliderProps = Settings & { children?: ReactNode }
@@ -107,7 +108,7 @@ export const FeaturesSection = () => {
   return (
     <section className="py-20 bg-white dark:bg-slate-900 px-6 sm:px-12 lg:px-14">
       <div className="text-center mb-12">
-        <p className="text-sm font-medium tracking-wide text-cyan-600 dark:text-cyan-400 uppercase">{t.eyebrow}</p>
+        <EyebrowChip ariaLabel={t.eyebrow}>{t.eyebrow}</EyebrowChip>
         <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">{t.title}</h2>
         <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">{t.description}</p>
       </div>

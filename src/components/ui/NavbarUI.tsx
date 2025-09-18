@@ -39,30 +39,28 @@ export const NavbarUI = () => {
       isMenuOpen={isMenuOpen}
     >
       {/* Brand a la izquierda en móvil y desktop */}
-      <NavbarContent justify="start" className="flex-1">
-        <NavbarBrand>
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white">
-              <Zap size={18} />
-            </span>
-            <span className="font-semibold text-slate-800 dark:text-slate-100">{t.brand}</span>
-          </div>
-        </NavbarBrand>
-      </NavbarContent>
+      <NavbarBrand>
+        <div className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white">
+            <Zap size={18} />
+          </span>
+          <span className="font-semibold text-slate-800 dark:text-slate-100">{t.brand}</span>
+        </div>
+      </NavbarBrand>
+
 
       {/* Botón hamburguesa (3 líneas) a la derecha en móvil */}
-      <NavbarContent justify="end" className="sm:hidden">
-        <Button
-          isIconOnly
-          variant="light"
-          radius="full"
-          aria-label={isMenuOpen ? t.closeMenu : t.openMenu}
-          className="text-slate-800 dark:text-slate-100"
-          onPress={() => setIsMenuOpen((v) => !v)}
-        >
-          <Menu size={22} />
-        </Button>
-      </NavbarContent>
+      <Button
+        isIconOnly
+        variant="light"
+        radius="full"
+        aria-label={isMenuOpen ? t.closeMenu : t.openMenu}
+        className="text-slate-800 dark:text-slate-100"
+        onPress={() => setIsMenuOpen((v) => !v)}
+      >
+        <Menu size={22} />
+      </Button>
+
 
       {/* Contenido derecho en desktop */}
       <NavbarContent justify="end" className="hidden sm:flex gap-3">

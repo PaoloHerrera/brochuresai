@@ -3,6 +3,7 @@ import { GithubIcon } from '../icons/GithubIcon'
 import { useTranslate } from '../../hooks/useTranslate'
 import { OPENSOURCE_TEXT } from '../../lang/opensource'
 import { GITHUB_URL } from '../../config'
+import { EyebrowChip } from '../ui/EyebrowChip'
 
 export const OpenSourceSection = () => {
   const { t } = useTranslate(OPENSOURCE_TEXT)
@@ -11,7 +12,7 @@ export const OpenSourceSection = () => {
     <section className="py-20 bg-gradient-to-b from-slate-900 to-slate-950 text-white px-6 sm:px-12 lg:px-14">
       <div>
         <div className="text-center mb-10">
-          <p className="text-sm font-medium tracking-wide text-cyan-400 uppercase">{t.eyebrow}</p>
+          <EyebrowChip ariaLabel={t.eyebrow}>{t.eyebrow}</EyebrowChip>
           <h2 className="mt-2 text-3xl sm:text-4xl font-bold">{t.title}</h2>
           <p className="mt-4 text-slate-300 max-w-2xl mx-auto">{t.description}</p>
         </div>
