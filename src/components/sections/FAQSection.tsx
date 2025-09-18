@@ -1,6 +1,7 @@
 import { Accordion, AccordionItem } from '@heroui/react'
 import { useTranslate } from '../../hooks/useTranslate'
 import { FAQ_TEXT } from '../../lang/faq'
+import { EyebrowChip } from '../ui/EyebrowChip'
 
 export const FAQSection = () => {
   const { t } = useTranslate(FAQ_TEXT)
@@ -9,7 +10,7 @@ export const FAQSection = () => {
     <section className="py-20 bg-gradient-to-b from-slate-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 px-6 sm:px-12 lg:px-14">
       <div>
         <div className="text-center mb-10">
-          <p className="text-sm font-medium tracking-wide text-cyan-600 dark:text-cyan-400 uppercase">{t.eyebrow}</p>
+          <EyebrowChip ariaLabel={t.eyebrow}>{t.eyebrow}</EyebrowChip>
           <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">{t.title}</h2>
         </div>
         <Accordion variant="splitted" className="bg-transparent">

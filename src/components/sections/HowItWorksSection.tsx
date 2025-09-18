@@ -1,7 +1,8 @@
 import { ArrowRight, Eye, FileDown, Globe, Wand2 } from 'lucide-react'
 import { useTranslate } from '../../hooks/useTranslate'
 import { HOWITWORKS_TEXT } from '../../lang/howitworks'
-import { Button, Chip, Link } from '@heroui/react'
+import { Button, Link } from '@heroui/react'
+import { EyebrowChip } from '../ui/EyebrowChip'
 
 export const HowItWorksSection = () => {
   const { t } = useTranslate(HOWITWORKS_TEXT)
@@ -15,17 +16,9 @@ export const HowItWorksSection = () => {
       {/* Contenido envuelto por Container en App.tsx */}
       <div>
         <div className="text-center mb-12">
-          <Chip
-            radius="sm"
-            size="sm"
-            variant="bordered"
-            classNames={{
-              base: "chip-base chip-accent",
-              content: "chip-content",
-            }}
-          >
+          <EyebrowChip>
             {t.eyebrow}
-          </Chip>
+          </EyebrowChip>
           <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
             {t.title}
           </h2>
