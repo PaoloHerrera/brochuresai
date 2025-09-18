@@ -13,7 +13,6 @@ export const getBrochuresRemaining = async (
     })
     return { success: true, data: res.data as GetBrochuresRemainingResponse }
   } catch (err) {
-    console.error("getBrochuresRemaining failed", err)
     return { success: false, error: err }
   }
 }
