@@ -55,7 +55,7 @@ export const NavbarUI = () => {
         variant="light"
         radius="full"
         aria-label={isMenuOpen ? t.closeMenu : t.openMenu}
-        className="text-slate-800 dark:text-slate-100"
+        className="text-slate-800 dark:text-slate-100 sm:hidden"
         onPress={() => setIsMenuOpen((v) => !v)}
       >
         <Menu size={22} />
