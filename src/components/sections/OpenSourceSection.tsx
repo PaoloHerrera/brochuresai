@@ -1,9 +1,10 @@
-import { Button, Link, Chip } from '@heroui/react'
+import { Button, Link } from '@heroui/react'
 import { GithubIcon } from '../icons/GithubIcon'
 import { useTranslate } from '../../hooks/useTranslate'
 import { OPENSOURCE_TEXT } from '../../lang/opensource'
 import { GITHUB_URL } from '../../config'
 import { EyebrowChip } from '../ui/EyebrowChip'
+import { InfoChip } from '../ui/InfoChip'
 
 export const OpenSourceSection = () => {
   const { t } = useTranslate(OPENSOURCE_TEXT)
@@ -19,18 +20,7 @@ export const OpenSourceSection = () => {
 
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-8">
           {t.badges.map((b: string, idx: number) => (
-            <Chip
-              key={idx}
-              radius="sm"
-              size="sm"
-              variant="bordered"
-              classNames={{
-                base: "chip-base chip-accent",
-                content: "chip-content",
-              }}
-            >
-              {b}
-            </Chip>
+            <InfoChip key={idx} variant="bordered">{b}</InfoChip>
           ))}
         </div>
 

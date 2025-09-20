@@ -1,6 +1,6 @@
 import { useTranslate } from '../../hooks/useTranslate'
 import { HEROTEXT } from '../../lang/hero'
-import { Chip, Tabs, Tab } from '@heroui/react'
+import { Tabs, Tab } from '@heroui/react'
 import { Sparkles, Zap, CheckCircle2, BookOpen, Eye } from 'lucide-react'
 import { useState, lazy, Suspense } from 'react'
 
@@ -14,6 +14,8 @@ import { showErrorToast, showSuccessToast } from '../../utils/toasts'
 import { PREVIEW_TEXT } from '../../lang/preview'
 import { FORM_TEXT } from '../../lang/form'
 import type { LanguageStore, BrochureType } from '../../types'
+
+import { InfoChip } from '../ui/InfoChip'
 
 const CHIP_ICONS = [
   <CheckCircle2 key="c1" size={14} />,
@@ -99,20 +101,14 @@ export const HeroSection = () => {
           <p className="text-slate-600 dark:text-slate-300 text-lg max-w-xl">{t.description}</p>
           <div className="flex flex-wrap gap-2.5 text-sm flex-col sm:flex-row items-center sm:items-start">
             {t.chips.map((chip, idx) => (
-              <Chip
+              <InfoChip
                 key={chip}
-                radius="sm"
-                size="sm"
                 variant="flat"
                 startContent={CHIP_ICONS[idx % CHIP_ICONS.length]}
                 aria-label={chip}
-                classNames={{
-                  base: "chip-base chip-accent",
-                  content: "chip-content",
-                }}
               >
                 {chip}
-              </Chip>
+              </InfoChip>
             ))}
           </div>
         </div>

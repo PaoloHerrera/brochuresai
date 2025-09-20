@@ -21,12 +21,22 @@ html, body {
   /* Solo estructura y espaciado; sin colores ni borde para permitir variantes */
   @apply !inline-flex !items-center !px-2 !py-1.5 sm:px-3 !gap-1.5;
 }
-@utility chip-accent {
-  /* Paleta por defecto usada en secciones (forzamos prioridad para sobrepasar estilos de variantes) */
-  @apply !bg-cyan-50 !text-cyan-700 !border-cyan-200 dark:!bg-cyan-900/30 dark:!text-cyan-200 dark:!border-cyan-700/40 !border-2;
-}
 @utility chip-content {
   @apply !text-xs sm:!text-sm !font-semibold;
+}
+
+/* Variantes diferenciadas para Eyebrow y Chips informativos */
+@utility chip-eyebrow {
+  /* Eyebrow: más sutil, en la gama blue/brand, con mayúsculas y tracking */
+  @apply !uppercase !tracking-wider !border !border-blue-300 !text-blue-700 !bg-blue-50/70 dark:!border-blue-500/40 dark:!text-blue-200 dark:!bg-blue-400/10;
+}
+@utility chip-eyebrow-content {
+  /* Ligeramente más pequeño que el chip informativo */
+  @apply !text-[10px] sm:!text-xs !font-semibold;
+}
+@utility chip-info {
+  /* Chip informativo: tono elegante y claro en la paleta cyan */
+  @apply !my-0.5 !border !bg-cyan-50/80 !text-cyan-800 !border-cyan-300 dark:!bg-cyan-400/10 dark:!text-cyan-200 dark:!border-cyan-500/40;
 }
 
 /* CTA principal (HowItWorks, etc.) como utilidad */
