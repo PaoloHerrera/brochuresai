@@ -16,8 +16,8 @@ export const EyebrowChip = ({ children, ariaLabel, ...rest }: EyebrowChipProps) 
       variant="bordered"
       aria-label={computedAria}
       classNames={{
-        base: 'chip-base chip-accent',
-        content: 'chip-content',
+        base: 'chip-base chip-eyebrow',
+        content: 'chip-eyebrow-content',
       }}
       {...rest}
     >
