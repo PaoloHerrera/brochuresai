@@ -7,7 +7,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   return (
     <HeroUIProvider>
       <ToastProvider/>
-        {children}
+      {children}
     </HeroUIProvider>
   )
 }

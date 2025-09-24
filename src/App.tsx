@@ -35,11 +35,11 @@ function App() {
         setAnonId(res.data.anon_id)
       } else {
         // Fallback seguro si hay error: no sobreescribir si ya existe, o setear mínimos
-        showErrorToast(t.error.errorRemaining.title, t.error.errorRemaining.description)
+        void showErrorToast(t.error.errorRemaining.title, t.error.errorRemaining.description)
       }
     }).catch(() => {
       // Evitar crash si se rechaza la promesa
-      showErrorToast(t.error.errorRemaining.title, t.error.errorRemaining.description)
+      void showErrorToast(t.error.errorRemaining.title, t.error.errorRemaining.description)
     })
 
     return () => { cancelled = true; controller.abort() }
