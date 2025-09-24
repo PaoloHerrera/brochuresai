@@ -1,4 +1,13 @@
-import { Sparkles, Globe, FileDown, Gauge, Palette, Shield, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  Sparkles,
+  Globe,
+  FileDown,
+  Gauge,
+  Palette,
+  Shield,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import { useTranslate } from '../../hooks/useTranslate'
 import { FEATURES_TEXT } from '../../lang/features'
 import { Button } from '@heroui/react'
@@ -26,7 +35,9 @@ export const FeaturesSection = () => {
   // Cargar react-slick y estilos de forma diferida cuando la sección entra en viewport
   const containerRef = useRef<HTMLDivElement>(null)
   const [inView, setInView] = useState(false)
-  const [SliderComp, setSliderComp] = useState<(new (props: SliderProps) => Slider) | null>(null)
+  const [SliderComp, setSliderComp] = useState<
+    (new (props: SliderProps) => Slider) | null
+      >(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -39,7 +50,7 @@ export const FeaturesSection = () => {
           obs.disconnect()
         }
       },
-      { rootMargin: '200px' }
+      { rootMargin: '200px' },
     )
     obs.observe(el)
     return () => obs.disconnect()
@@ -48,14 +59,17 @@ export const FeaturesSection = () => {
   useEffect(() => {
     if (!inView || SliderComp) return
     let cancelled = false
-    ;(async () => {
+    void (async () => {
       try {
         const [{ default: SliderCtor }] = await Promise.all([
           import('react-slick'),
           import('slick-carousel/slick/slick.css'),
           // Nota: removemos slick-theme.css para reducir ~12KB; no usamos dots/arrows por defecto
         ])
-        if (!cancelled) setSliderComp(() => (SliderCtor as unknown as new (props: SliderProps) => Slider))
+        if (!cancelled)
+          setSliderComp(
+            () => SliderCtor as unknown as new (props: SliderProps) => Slider,
+          )
       } catch {
         // En caso de fallo al cargar, no romper la UI
       }
@@ -70,20 +84,24 @@ export const FeaturesSection = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return
     const mq = window.matchMedia('(min-width: 1024px)')
-    const handler = (e: MediaQueryListEvent | MediaQueryList) => setIsLgUp('matches' in e ? e.matches : (e as MediaQueryList).matches)
+    const handler = (e: MediaQueryListEvent | MediaQueryList) =>
+      setIsLgUp('matches' in e ? e.matches : (e as MediaQueryList).matches)
     // set initial
     handler(mq as unknown as MediaQueryList)
     // subscribe
     mq.addEventListener('change', handler as (e: MediaQueryListEvent) => void)
     return () => {
-      mq.removeEventListener('change', handler as (e: MediaQueryListEvent) => void)
+      mq.removeEventListener(
+        'change',
+        handler as (e: MediaQueryListEvent) => void,
+      )
     }
   }, [])
 
   // Agrupar dinámicamente según breakpoint (sin ocultar tarjetas)
   const groupedSlides = useMemo(() => {
     const size = isLgUp ? 2 : 1
-    const chunks: typeof t.items[] = []
+    const chunks: (typeof t.items)[] = []
     for (let i = 0; i < t.items.length; i += size) {
       chunks.push(t.items.slice(i, i + size))
     }
@@ -109,8 +127,12 @@ export const FeaturesSection = () => {
     <section className="py-20 bg-white dark:bg-slate-900 px-6 sm:px-12 lg:px-14">
       <div className="text-center mb-12">
         <EyebrowChip ariaLabel={t.eyebrow}>{t.eyebrow}</EyebrowChip>
-        <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">{t.title}</h2>
-        <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">{t.description}</p>
+        <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">
+          {t.title}
+        </h2>
+        <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+          {t.description}
+        </p>
       </div>
 
       <div className="relative">
@@ -130,12 +152,20 @@ export const FeaturesSection = () => {
           </div>
 
           {/* Carrusel con react-slick: fade y agrupación responsive (1 en <md, 2 en md+) */}
-          <div className="flex-1 min-w-0 w-full overflow-hidden" ref={containerRef}>
+          <div
+            className="flex-1 min-w-0 w-full overflow-hidden"
+            ref={containerRef}
+          >
             {SliderComp ? (
-              <SliderComp ref={sliderRef as React.RefObject<Slider>} {...settings}>
+              <SliderComp
+                ref={sliderRef as React.RefObject<Slider>}
+                {...settings}
+              >
                 {groupedSlides.map((group, slideIdx) => (
                   <div key={slideIdx} className="px-3">
-                    <div className={`grid grid-cols-1 ${isLgUp ? 'lg:grid-cols-2' : ''} gap-6 justify-items-center`}>
+                    <div
+                      className={`grid grid-cols-1 ${isLgUp ? 'lg:grid-cols-2' : ''} gap-6 justify-items-center`}
+                    >
                       {group.map((item, i) => {
                         const absoluteIndex = slideIdx * (isLgUp ? 2 : 1) + i
                         const Icon = icons[absoluteIndex % icons.length]
@@ -149,8 +179,12 @@ export const FeaturesSection = () => {
                                 <Icon size={24} />
                               </div>
                               <div>
-                                <h3 className="font-semibold text-slate-900 dark:text-white text-lg md:text-xl">{item.title}</h3>
-                                <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 mt-1">{item.description}</p>
+                                <h3 className="font-semibold text-slate-900 dark:text-white text-lg md:text-xl">
+                                  {item.title}
+                                </h3>
+                                <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 mt-1">
+                                  {item.description}
+                                </p>
                               </div>
                             </div>
                           </div>

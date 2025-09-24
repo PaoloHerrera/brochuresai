@@ -46,9 +46,9 @@ export const setLanguage = async (lang: 'en' | 'es') => {
 export const selectButtonByName = (name: RegExp) => screen.getByRole('button', { name })
 
 export const getSubmitButton = (container: HTMLElement): HTMLButtonElement => {
-  const btn = container.querySelector('button[type="submit"]') as HTMLButtonElement | null
+  const btn = container.querySelector('button[type="submit"]')
   if (!btn) throw new Error('Submit button not found')
-  return btn
+  return btn as HTMLButtonElement
 }
 
 export const makePdfBlob = () => new Blob(['fake pdf content'], { type: 'application/pdf' })
@@ -85,7 +85,7 @@ export const clickRegenerateEN = async () => {
 }
 
 export const getSelectedTabKey = () => {
-  const tabs = screen.getByTestId('hero-tabs') as HTMLElement
+  const tabs = screen.getByTestId('hero-tabs')
   return tabs.getAttribute('data-selected')
 }
 

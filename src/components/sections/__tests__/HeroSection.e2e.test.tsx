@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import * as React from 'react'
 
 import { renderWithProviders } from '../../../test/test-utils'
 import { HeroSection } from '../HeroSection'

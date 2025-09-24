@@ -26,7 +26,7 @@ export const useThemeStore = create<ThemeState>()(
         const currentTheme = get().theme
         const newTheme = currentTheme === 'light' ? 'dark' : 'light'
         get().setTheme(newTheme)
-      }
+      },
     }),
     {
       name: 'theme-storage', // unique name for the storage
@@ -37,7 +37,7 @@ export const useThemeStore = create<ThemeState>()(
         } else {
           document.documentElement.classList.remove('dark')
         }
-      }
+      },
     },
   ),
 )

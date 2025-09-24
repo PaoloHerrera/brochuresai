@@ -17,7 +17,7 @@ export const BrochurePreview: FC<{ isLoading?: boolean; onRegenerate?: () => voi
     const result = await downloadPdf(cacheKey)
 
     if (!result.success) {
-      showErrorToast(t.errorTitle, t.errorDescription)
+      void showErrorToast(t.errorTitle, t.errorDescription)
       return
     }
 
@@ -46,7 +46,7 @@ export const BrochurePreview: FC<{ isLoading?: boolean; onRegenerate?: () => voi
             title={t.regenerateLabel}
             className="border border-slate-200 dark:border-slate-700 bg-cyan-600 hover:bg-cyan-700 text-white px-2 sm:px-4"
             startContent={<RotateCcw size={16} aria-hidden="true" focusable="false" />}
-            onPress={() => onRegenerate?.()}
+            onPress={() => { void onRegenerate?.() }}
             isLoading={isLoading}
           >
             <span className="hidden sm:inline">{t.regenerateLabel}</span>
@@ -58,7 +58,7 @@ export const BrochurePreview: FC<{ isLoading?: boolean; onRegenerate?: () => voi
           isDisabled={isDownloadDisabled}
           className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-4"
           startContent={<FileDown size={16} aria-hidden="true" focusable="false" />}
-          onPress={handleDownloadPdf}
+          onPress={() => void handleDownloadPdf()}
           isLoading={isDownloading}
           aria-label={t.downloadLabel}
           title={t.downloadLabel}

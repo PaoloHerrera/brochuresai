@@ -44,14 +44,14 @@ export const HeroSection = () => {
     const result = await submitBrochure(payload)
     if (!result.success) {
       if (result.status === 429) {
-        showErrorToast(tForm.limitBrochuresTitle, tForm.limitBrochuresDescription)
+        void showErrorToast(tForm.limitBrochuresTitle, tForm.limitBrochuresDescription)
       } else {
-        showErrorToast(tForm.errorTitle, tForm.errorDescription)
+        void showErrorToast(tForm.errorTitle, tForm.errorDescription)
       }
       return false
     }
 
-    showSuccessToast(tForm.successTitle, tForm.successDescription)
+    void showSuccessToast(tForm.successTitle, tForm.successDescription)
     return true
   }
 
@@ -74,7 +74,7 @@ export const HeroSection = () => {
     if (isLoading) return
 
     if (!companyName || !url) {
-      showErrorToast(tPreview.errorTitleRegenerate, tPreview.errorDescriptionRegenerate)
+      void showErrorToast(tPreview.errorTitleRegenerate, tPreview.errorDescriptionRegenerate)
       return
     }
 
@@ -119,9 +119,9 @@ export const HeroSection = () => {
             className="w-full"
             aria-label={t.tabsAria}
             classNames={{
-              tabList: "w-full relative rounded-none p-0 mx-1 border-b border-divider gap-0",
-              cursor: "w-full bg-[#22d3ee]",
-              tabContent: "group-data-[selected=true]:text-[#06b6d4]",
+              tabList: 'w-full relative rounded-none p-0 mx-1 border-b border-divider gap-0',
+              cursor: 'w-full bg-[#22d3ee]',
+              tabContent: 'group-data-[selected=true]:text-[#06b6d4]',
             }}
             color="primary"
             variant="underlined"
@@ -152,7 +152,7 @@ export const HeroSection = () => {
                 onUrlChange={setFormUrl}
                 onLanguageChange={setFormLanguage}
                 onBrochureTypeChange={setFormType}
-                onSubmit={handleSubmit}
+                onSubmit={() => void handleSubmit()}
               />
             </Tab>
             <Tab

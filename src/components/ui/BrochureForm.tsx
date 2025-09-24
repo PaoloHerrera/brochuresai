@@ -18,7 +18,6 @@ import { useTranslate } from '../../hooks/useTranslate'
 import { useBrochuresRemainingStore } from '../../stores/useBrochuresRemaining'
 import { inputClassNames, textDefault, fieldWrapper } from './fieldStyles'
 
-
 import type { LanguageStore, BrochureType } from '../../types'
 
 interface BrochureFormProps {
@@ -33,7 +32,6 @@ interface BrochureFormProps {
   onBrochureTypeChange: (value: BrochureType) => void
   onSubmit: () => void
 }
-
 
 const BrochureForm: React.FC<BrochureFormProps> = ({
   isLoading,
@@ -53,30 +51,34 @@ const BrochureForm: React.FC<BrochureFormProps> = ({
   const { brochuresRemaining } = useBrochuresRemainingStore()
 
   // Iconos dinámicos para los triggers de los Selects
-  const brochureTypeIcon = brochureType === 'funny' ? <Smile size={16} /> : <Briefcase size={16} />
+  const brochureTypeIcon =
+    brochureType === 'funny' ? <Smile size={16} /> : <Briefcase size={16} />
   const languageIcon = <Globe size={16} />
 
   // Estilos dinámicos y valores para el indicador de "restantes"
   const remaining = Math.max(0, brochuresRemaining)
   // Estilos sutiles para el chip superior derecho
-  const badgeClasses = remaining <= 0
-    ? 'text-red-700 border-red-200 bg-red-50/60 dark:text-red-200 dark:border-red-500/30 dark:bg-red-500/10'
-    : remaining <= 2
-    ? 'text-amber-800 border-amber-200 bg-amber-50/60 dark:text-amber-200 dark:border-amber-500/30 dark:bg-amber-500/10'
-    : 'text-teal-800 border-teal-200 bg-teal-50/60 dark:text-teal-200 dark:border-teal-500/30 dark:bg-teal-500/10'
+  const badgeClasses =
+    remaining <= 0
+      ? 'text-red-700 border-red-200 bg-red-50/60 dark:text-red-200 dark:border-red-500/30 dark:bg-red-500/10'
+      : remaining <= 2
+        ? 'text-amber-800 border-amber-200 bg-amber-50/60 dark:text-amber-200 dark:border-amber-500/30 dark:bg-amber-500/10'
+        : 'text-teal-800 border-teal-200 bg-teal-50/60 dark:text-teal-200 dark:border-teal-500/30 dark:bg-teal-500/10'
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    await onSubmit()
+    void onSubmit()
   }
 
   return (
     <Card className="max-w-3xl mx-auto p-6 shadow-lg bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
-      <Form onSubmit={handleSubmit} className="flex flex-col gap-6 lg:gap-10">
+      <Form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-6 lg:gap-10">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2 sm:text-2xl font-semibold">
             <Globe className="text-blue-500" />
-            <span className="text-slate-900 dark:text-slate-100">{t.title}</span>
+            <span className="text-slate-900 dark:text-slate-100">
+              {t.title}
+            </span>
           </div>
           <Chip
             radius="sm"
@@ -87,22 +89,24 @@ const BrochureForm: React.FC<BrochureFormProps> = ({
             title={t.remainingTooltip}
             classNames={{
               base: `ml-3 chip-base ${badgeClasses}`,
-              content: "chip-content",
+              content: 'chip-content',
             }}
           >
             <span className="tabular-nums">{remaining}</span>
           </Chip>
         </div>
-        <p className="text-gray-500 dark:text-slate-400 -mt-3 mb-2 text-sm">{t.description}</p>
-        <div className='w-full'>
+        <p className="text-gray-500 dark:text-slate-400 -mt-3 mb-2 text-sm">
+          {t.description}
+        </p>
+        <div className="w-full">
           <label className="block text-sm font-medium mb-1 text-slate-800 dark:text-slate-300">
             {t.companyNameLabel}
           </label>
           <Input
             name="companyName"
             isDisabled={isLoading}
-            placeholder={t.companyNamePlaceholder} 
-            isRequired 
+            placeholder={t.companyNamePlaceholder}
+            isRequired
             classNames={inputClassNames}
             value={companyName}
             onValueChange={onCompanyNameChange}
@@ -115,9 +119,9 @@ const BrochureForm: React.FC<BrochureFormProps> = ({
           <Input
             name="url"
             isDisabled={isLoading}
-            placeholder={t.urlPlaceholder} 
-            type="url" 
-            isRequired 
+            placeholder={t.urlPlaceholder}
+            type="url"
+            isRequired
             classNames={inputClassNames}
             value={url}
             onValueChange={onUrlChange}
@@ -149,7 +153,13 @@ const BrochureForm: React.FC<BrochureFormProps> = ({
               {t.styleOptions.map((opt) => (
                 <SelectItem
                   key={opt.value}
-                  startContent={opt.value === 'professional' ? <Briefcase size={16} /> : <Smile size={16} />}
+                  startContent={
+                    opt.value === 'professional' ? (
+                      <Briefcase size={16} />
+                    ) : (
+                      <Smile size={16} />
+                    )
+                  }
                 >
                   {opt.label}
                 </SelectItem>
@@ -197,7 +207,10 @@ const BrochureForm: React.FC<BrochureFormProps> = ({
               radius="full"
               className="group relative mt-3 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-4 text-white text-lg font-semibold shadow-lg shadow-blue-600/20 transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <Wand2 size={24} className="transition-transform duration-200 ease-out group-hover:-rotate-12 group-hover:translate-x-0.5" /> 
+              <Wand2
+                size={24}
+                className="transition-transform duration-200 ease-out group-hover:-rotate-12 group-hover:translate-x-0.5"
+              />
               {t.submitButton}
             </Button>
           </div>

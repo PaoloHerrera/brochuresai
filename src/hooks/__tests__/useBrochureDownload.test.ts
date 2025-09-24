@@ -77,7 +77,7 @@ describe('useBrochureDownload', () => {
     })
 
     expect(r).toEqual(expect.objectContaining({ success: false }))
-    expect((r as { status?: number }).status).toBeUndefined()
+    expect((r as unknown as { status?: number }).status).toBeUndefined()
     await waitFor(() => expect(result.current.isDownloading).toBe(false))
   })
 })

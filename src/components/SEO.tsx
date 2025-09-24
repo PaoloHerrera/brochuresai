@@ -16,7 +16,7 @@ export const SEO: React.FC = () => {
 
     // Meta description y OG (simple, localizable si agregamos claves en lang)
     const ensureMeta = (name: string, attr: 'name' | 'property' = 'name') => {
-      let el = document.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null
+      let el = document.head.querySelector(`meta[${attr}="${name}"]`)
       if (!el) {
         el = document.createElement('meta')
         el.setAttribute(attr, name)
