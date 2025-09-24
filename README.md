@@ -1,4 +1,4 @@
-[![CI](https://github.com/PaoloHerrera/brochuresai/actions/workflows/ci.yml/badge.svg)](https://github.com/PaoloHerrera/brochuresai/actions/workflows/ci.yml)
+[![CI](https://github.com/PaoloHerrera/brochuresai/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/PaoloHerrera/brochuresai/actions/workflows/ci.yml)
 
 # React + TypeScript + Vite
 
