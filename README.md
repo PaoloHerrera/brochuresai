@@ -1,3 +1,5 @@
+[![CI](https://github.com/PaoloHerrera/brochuresai/actions/workflows/ci.yml/badge.svg)](https://github.com/PaoloHerrera/brochuresai/actions/workflows/ci.yml)
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
