@@ -156,10 +156,13 @@ describe('HeroSection - guards de isLoading', () => {
     const submitBtn = getSubmitButton(container)
     await userEvent.click(submitBtn)
 
-    // Ahora clicar Regenerate debería ser ignorado por el guard (isLoading)
-    await clickRegenerateEN()
+    // Verificar que el botón Regenerate no está disponible durante la carga
+    await waitFor(() => {
+      const regenerateBtn = screen.queryByRole('button', { name: new RegExp(PREVIEW_TEXT.en.regenerateLabel, 'i') })
+      expect(regenerateBtn).not.toBeInTheDocument()
+    })
 
-    // Asegura que no hay segunda llamada a axios.post
+    // Asegura que solo hay una llamada a axios.post (la del submit)
     expect(asAxios().post).toHaveBeenCalledTimes(1)
 
     // Resuelve la petición pendiente

@@ -69,9 +69,19 @@ describe('BrochurePreview', () => {
     // No debe renderizar el iframe de la vista previa mientras carga
     expect(screen.queryByTitle('Brochure preview')).not.toBeInTheDocument()
 
-    // Mientras carga, el botón de descarga debe estar deshabilitado
-    const downloadBtn = selectButtonByName(/download pdf/i)
-    expect(downloadBtn).toBeDisabled()
+    // Los botones NO deben aparecer cuando está cargando
+    expect(screen.queryByRole('button', { name: /download pdf/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /regenerate brochure/i })).not.toBeInTheDocument()
+  })
+
+  it('muestra mensaje de generación cuando isLoading es true', () => {
+    renderWithProviders(<BrochurePreview isLoading />)
+
+    // Debe mostrar el mensaje de generación
+    expect(screen.getByText(/generating brochure/i)).toBeInTheDocument()
+    
+    // Debe mostrar el icono de Sparkles (como SVG, no img)
+    expect(screen.getByTestId('sparkles-icon')).toBeInTheDocument()
   })
 
   it('intenta descargar cuando hay cacheKey', async () => {

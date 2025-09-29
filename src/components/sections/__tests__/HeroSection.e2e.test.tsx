@@ -49,6 +49,12 @@ describe('HeroSection - flujo E2E formulario → generar → preview → descarg
     // 3) Cambia a pestaña preview
     await waitFor(() => expect(getSelectedTabKey()).toBe('brochure-preview'))
 
+    // Esperar a que termine la carga del brochure
+    await waitFor(() => {
+      const loadingMessage = container.ownerDocument.querySelector('[data-testid="sparkles-icon"]')
+      expect(loadingMessage).not.toBeInTheDocument()
+    })
+
     // 4) Preparar mock de descarga PDF con Content-Disposition
     const pdfBlob = makePdfBlob()
     asAxios().post.mockResolvedValueOnce(
@@ -62,7 +68,7 @@ describe('HeroSection - flujo E2E formulario → generar → preview → descarg
     const createUrlSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake-e2e')
     const revokeUrlSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
 
-    // 5) Click en botón de descarga
+    // 5) Click en botón de descarga (solo cuando no está en loading)
     const downloadBtn = container.ownerDocument.querySelector('button[aria-label="Download PDF"]') as HTMLButtonElement
     expect(downloadBtn).toBeTruthy()
     await userEvent.click(downloadBtn)
