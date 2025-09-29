@@ -40,11 +40,14 @@ jobs:
           mkdir -p ~/.bun
           curl -fsSL https://github.com/oven-sh/bun/releases/download/bun-v1.2.21/bun-linux-x64.zip -o bun.zip
           unzip bun.zip -d ~/.bun
-          chmod +x ~/.bun/bun-linux-x64/bun
+          mv ~/.bun/bun-linux-x64/bun ~/.bun/bun
+          chmod +x ~/.bun/bun
           
-      - name: Add Bun to PATH
+      - name: Add Bun to PATH and create bunx symlink
         run: |
-          echo "$HOME/.bun/bun-linux-x64" >> $GITHUB_PATH
+          echo "$HOME/.bun" >> $GITHUB_PATH
+          ln -sf ~/.bun/bun ~/.bun/bunx
+          chmod +x ~/.bun/bunx
       
       - name: Install dependencies
         run: bun install --frozen-lockfile
