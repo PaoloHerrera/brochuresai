@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 import { Button, Skeleton } from '@heroui/react'
-import { FileDown, RotateCcw } from 'lucide-react'
+import { FileDown, RotateCcw, Sparkles } from 'lucide-react'
 import { showErrorToast } from '../../utils/toasts'
 import { useBrochureStore } from '../../stores/useBrochureStore'
 import { useBrochureDownload } from '../../hooks/useBrochureDownload'
@@ -35,36 +35,54 @@ export const BrochurePreview: FC<{ isLoading?: boolean; onRegenerate?: () => voi
   return (
     <div className="w-full rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900" aria-busy={isLoading}>
       <div className="flex items-center justify-between gap-3 px-3 py-2 bg-white/80 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-700 backdrop-blur">
-        {/* Botón de "volver a generar" responsivo: icon-only en mobile */}
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            radius="full"
-            variant="flat"
-            isDisabled={isLoading}
-            aria-label={t.regenerateLabel}
-            title={t.regenerateLabel}
-            className="border border-slate-200 dark:border-slate-700 bg-cyan-600 hover:bg-cyan-700 text-white px-2 sm:px-4"
-            startContent={<RotateCcw size={16} aria-hidden="true" focusable="false" />}
-            onPress={() => { void onRegenerate?.() }}
-            isLoading={isLoading}
-          >
-            <span className="hidden sm:inline">{t.regenerateLabel}</span>
-          </Button>
-        </div>
-        <Button
-          size="sm"
-          radius="full"
-          isDisabled={isDownloadDisabled}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-4"
-          startContent={<FileDown size={16} aria-hidden="true" focusable="false" />}
-          onPress={() => void handleDownloadPdf()}
-          isLoading={isDownloading}
-          aria-label={t.downloadLabel}
-          title={t.downloadLabel}
-        >
-          <span className="hidden sm:inline">{t.downloadLabel}</span>
-        </Button>
+        {isLoading ? (
+          <div className="flex items-center gap-3 flex-1 justify-center py-1">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+              <Sparkles size={20} className="animate-pulse" aria-hidden="true" />
+              <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-pulse">
+                {t.generatingLabel}
+              </span>
+              <div className="flex gap-1">
+                <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Botón de "volver a generar" responsivo: icon-only en mobile */}
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                radius="full"
+                variant="flat"
+                isDisabled={isLoading}
+                aria-label={t.regenerateLabel}
+                title={t.regenerateLabel}
+                className="border border-slate-200 dark:border-slate-700 bg-cyan-600 hover:bg-cyan-700 text-white px-2 sm:px-4"
+                startContent={<RotateCcw size={16} aria-hidden="true" focusable="false" />}
+                onPress={() => void onRegenerate?.()}
+                isLoading={isLoading}
+              >
+                <span className="hidden sm:inline">{t.regenerateLabel}</span>
+              </Button>
+            </div>
+            <Button
+              size="sm"
+              radius="full"
+              isDisabled={isDownloadDisabled}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-4"
+              startContent={<FileDown size={16} aria-hidden="true" focusable="false" />}
+              onPress={() => void handleDownloadPdf()}
+              isLoading={isDownloading}
+              aria-label={t.downloadLabel}
+              title={t.downloadLabel}
+            >
+              <span className="hidden sm:inline">{t.downloadLabel}</span>
+            </Button>
+          </>
+        )}
       </div>
 
       {isLoading ? (
