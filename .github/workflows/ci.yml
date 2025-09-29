@@ -25,19 +25,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       
-      - name: Cache bun
+      - name: Cache Bun installation
         uses: actions/cache@v4
+        id: bun-cache
         with:
           path: ~/.bun
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb') }}
+          key: ${{ runner.os }}-bun-1.2.21
           restore-keys: |
             ${{ runner.os }}-bun-
 
-      - name: Install Bun from GitHub release
+      - name: Install Bun manually
+        if: steps.bun-cache.outputs.cache-hit != 'true'
         run: |
+          mkdir -p ~/.bun
           curl -fsSL https://github.com/oven-sh/bun/releases/download/bun-v1.2.21/bun-linux-x64.zip -o bun.zip
           unzip bun.zip -d ~/.bun
-          echo "$HOME/.bun/bin" >> $GITHUB_PATH
+          chmod +x ~/.bun/bun-linux-x64/bun
+          
+      - name: Add Bun to PATH
+        run: |
+          echo "$HOME/.bun/bun-linux-x64" >> $GITHUB_PATH
       
       - name: Install dependencies
         run: bun install --frozen-lockfile
